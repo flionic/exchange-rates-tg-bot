@@ -261,7 +261,8 @@ def DBIntegrityCheck():
             "id": {"type": "INTEGER", "default": "NULL PRIMARY KEY"},
             "chatID": {"type": "INTEGER", "default": "NULL"},
             "trigger": {"type": "TEXT", "default": "NULL"},
-            "answer": {"type": "TEXT", "default": "NULL"}
+            "answer": {"type": "TEXT", "default": "NULL"},
+            "authorID": {"type": "INTEGER", "default": "NULL"},
         }
         if table_exists:
             # Fetch existing columns
@@ -272,7 +273,7 @@ def DBIntegrityCheck():
             for column_name, column_properties in expected_columns.items():
                 # If the column does not exist in the table, add it
                 if column_name not in existing_columns:
-                    Print(f"Column {column_name} does not exist in SettingsGroups table. Adding it now.", "S")
+                    Print(f"Column {column_name} does not exist in MemePhrases table. Adding it now.", "S")
                     cursor.execute(f'''ALTER TABLE SettingsGroups ADD COLUMN {column_name} {column_properties["type"]} DEFAULT {column_properties["default"]};''')
         else:
             # Table does not exist, create it with all required columns
@@ -1379,6 +1380,7 @@ def GetChatIDs():
     res += [k[0] for k in cursor.fetchall()]
     return res
 
+
 def getPhrase(chat_id, trigger):
     chat_id = int(chat_id)
     with sql.connect('DataBases/DataForBot.sqlite') as con:
@@ -1389,22 +1391,37 @@ def getPhrase(chat_id, trigger):
             return res[3]
         return res
 
-def addPhrase(chat_id, trigger, answer):
+
+def isPhraseAuthor(chat_id, trigger, user_id):
+    chat_id = int(chat_id)
+    with sql.connect('DataBases/DataForBot.sqlite') as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
+        res = cursor.fetchone()
+        if res:
+            print(res[4], user_id)
+            return True if res[4] == int(user_id) else False
+        return res
+
+
+def addPhrase(chat_id, trigger, answer, author_id):
     chat_id = int(chat_id)
     with sql.connect('DataBases/DataForBot.sqlite') as con:
         if getPhrase(chat_id, trigger) is not None:
             return False
         cursor = con.cursor()
-        cursor.execute("INSERT INTO MemePhrases (chatID,trigger,answer) values (?,?,?)", (chat_id, trigger.lower(), answer))
+        cursor.execute(
+            "INSERT INTO MemePhrases (chatID,trigger,answer,authorID) values (?,?,?,?)",
+            (chat_id, trigger.lower(), answer, author_id)
+        )
         con.commit()
         return True
+
 
 def delPhrase(chat_id, trigger):
     chat_id = int(chat_id)
     with sql.connect('DataBases/DataForBot.sqlite') as con:
         cursor = con.cursor()
-        if getPhrase(chat_id, trigger) is None:
-            return False
         cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
         con.commit()
         return True

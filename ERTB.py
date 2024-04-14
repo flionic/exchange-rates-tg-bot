@@ -22,7 +22,8 @@ from NewPrint import Print, EnableLogging, DisableLogging, PrintMainInfo
 from SkipUpdates import EnableUpdates, DisableUpdates, IsUpdate
 from GetExchangeRates import SheduleUpdate, SheduleCryptoUpdate
 from BlackList import IsUserInBlackList, LoadBlackList, RemoveFromBlackList, AddToBlackList
-from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, LoadSymbols, SearchValuesAndCurrencies, RemoveIgnored, SpecialSplit, MessagePreparation
+from Processing import AnswerText, LoadCurrencies, LoadCrypto, LoadDictionaries, LoadFlags, LoadSymbols, \
+    SearchValuesAndCurrencies, RemoveIgnored, SpecialSplit, MessagePreparation
 import TextHelper as CustomMarkup
 from TextHelper import LoadTexts, GetText
 import ListsCache
@@ -34,6 +35,7 @@ bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 IsStartedCount = False
 
+
 def GetDataFromMessage(message: types.Message):
     data = {}
     data['fromUserId'] = message.from_user.id
@@ -43,12 +45,14 @@ def GetDataFromMessage(message: types.Message):
     data['userName'] = message.from_user.username
     return data
 
+
 def IsFromBot(message: types.Message):
     try:
         if message.forward_from.username == botUsername or message.from_user.id == 777000:
             return True
     except:
         return False
+
 
 # Public commands
 @dp.message_handler(commands=['about'])
@@ -57,7 +61,9 @@ async def AboutMes(message: types.Message):
     if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
         return
     IsChatExist(messageData["chatID"], messageData["chatType"], messageData["chatName"])
-    await message.reply(GetText(messageData['chatID'], "about", messageData['chatType']), reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+    await message.reply(GetText(messageData['chatID'], "about", messageData['chatType']),
+                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                               messageData['chatType']))
 
 
 @dp.message_handler(commands=['help'])
@@ -66,10 +72,13 @@ async def HelpMes(message: types.Message):
     if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
         return
     IsChatExist(messageData["chatID"], messageData["chatType"], messageData["chatName"])
-    await message.reply(GetText(messageData["chatID"], "help", messageData["chatType"]), reply_markup=CustomMarkup.DeleteMarkup(messageData["chatID"], messageData["chatType"]))
+    await message.reply(GetText(messageData["chatID"], "help", messageData["chatType"]),
+                        reply_markup=CustomMarkup.DeleteMarkup(messageData["chatID"],
+                                                               messageData["chatType"]))
 
 
-def CanUserEditSettings(chatID: str, chatType: str, memberStatus: str, userID: str, userName: str, AllMembersAreAdministrators: bool = False) -> bool:
+def CanUserEditSettings(chatID: str, chatType: str, memberStatus: str, userID: str, userName: str,
+                        AllMembersAreAdministrators: bool = False) -> bool:
     сanUserEditSettings = False
     AllChatSettings = DBH.GetAllSettings(chatID, chatType)
     if DBH.IsAdmin(userID):
@@ -87,10 +96,14 @@ def CanUserEditSettings(chatID: str, chatType: str, memberStatus: str, userID: s
                 if memberStatus == 'creator' or userName == "GroupAnonymousBot":
                     сanUserEditSettings = True
             elif AllMembersAreAdministrators == False:
-                if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or userName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or userName == "GroupAnonymousBot"):
+                if whoCanEditSettings == 'admins' and (
+                        memberStatus == "administrator" or memberStatus == "creator" or userName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (
+                        memberStatus == "creator" or userName == "GroupAnonymousBot"):
                     сanUserEditSettings = True
         elif chatType == "supergroup":
-            if whoCanEditSettings == 'admins' and (memberStatus == "administrator" or memberStatus == "creator" or userName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (memberStatus == "creator" or userName == "GroupAnonymousBot"):
+            if whoCanEditSettings == 'admins' and (
+                    memberStatus == "administrator" or memberStatus == "creator" or userName == "GroupAnonymousBot") or whoCanEditSettings == 'creator' and (
+                    memberStatus == "creator" or userName == "GroupAnonymousBot"):
                 сanUserEditSettings = True
     return сanUserEditSettings
 
@@ -103,10 +116,18 @@ async def SettingsMes(message: types.Message):
     IsChatExist(messageData["chatID"], messageData["chatType"], messageData["chatName"])
 
     member = await message.chat.get_member(messageData["fromUserId"])
-    if CanUserEditSettings(messageData["chatID"], messageData["chatType"], member.status, message.from_user.id, messageData["userName"], message.chat.all_members_are_administrators):
-        await message.reply(GetText(messageData["chatID"], "main_settings_menu", messageData["chatType"]), parse_mode="HTML", reply_markup=CustomMarkup.SettingsMarkup(messageData['chatID'], messageData['chatType']))
+    if CanUserEditSettings(messageData["chatID"], messageData["chatType"], member.status,
+                           message.from_user.id, messageData["userName"],
+                           message.chat.all_members_are_administrators):
+        await message.reply(GetText(messageData["chatID"], "main_settings_menu", messageData["chatType"]),
+                            parse_mode="HTML", reply_markup=CustomMarkup.SettingsMarkup(messageData['chatID'],
+                                                                                        messageData[
+                                                                                            'chatType']))
     else:
-        await message.reply(GetText(messageData["chatID"], "error_main_settings_menu", messageData["chatType"]), parse_mode="HTML", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+        await message.reply(
+            GetText(messageData["chatID"], "error_main_settings_menu", messageData["chatType"]),
+            parse_mode="HTML",
+            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
 
 
 @dp.message_handler(commands=['donate'])
@@ -115,7 +136,9 @@ async def DonateMes(message: types.Message):
     if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
         return
     IsChatExist(messageData["chatID"], messageData["chatType"], messageData["chatName"])
-    await message.reply(GetText(messageData["chatID"], "donate", messageData["chatType"]), reply_markup=CustomMarkup.DonateMarkup(messageData['chatID'], messageData['chatType']))
+    await message.reply(GetText(messageData["chatID"], "donate", messageData["chatType"]),
+                        reply_markup=CustomMarkup.DonateMarkup(messageData['chatID'],
+                                                               messageData['chatType']))
 
 
 # Admin`s commands
@@ -128,23 +151,28 @@ async def EchoVoid(message: types.Message):
         MessageToUsers = (message.text).replace("/echo ", "")
         adminList = DBH.GetAdmins()
         for i in adminList:
-            await bot.send_message(i, "Started sending a message to all users. Message text:\n\n" + MessageToUsers, reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+            await bot.send_message(i,
+                                   "Started sending a message to all users. Message text:\n\n" + MessageToUsers,
+                                   reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
         listGC = DBH.GetGroupChatIDs()
         for i in listGC:
             try:
-                await bot.send_message(i, MessageToUsers, parse_mode="HTML", disable_web_page_preview=True, reply_markup=CustomMarkup.DonateMarkup(i, "group"))
+                await bot.send_message(i, MessageToUsers, parse_mode="HTML", disable_web_page_preview=True,
+                                       reply_markup=CustomMarkup.DonateMarkup(i, "group"))
             except:
                 Print("Chat " + str(i) + " is not available.", "W")
             time.sleep(0.035)
         listPC = DBH.GetPrivateChatIDs()
         for i in listPC:
             try:
-                await bot.send_message(i, MessageToUsers, parse_mode="HTML", disable_web_page_preview=True, reply_markup=CustomMarkup.DonateMarkup(i, "private"))
+                await bot.send_message(i, MessageToUsers, parse_mode="HTML", disable_web_page_preview=True,
+                                       reply_markup=CustomMarkup.DonateMarkup(i, "private"))
             except:
                 Print("Chat " + str(i) + " is not available.", "W")
             time.sleep(0.035)
         for i in adminList:
-            await bot.send_message(i, "The 'echo' is over.", reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+            await bot.send_message(i, "The 'echo' is over.",
+                                   reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
 
 
 @dp.message_handler(commands=['write'])
@@ -181,9 +209,11 @@ async def CountVoid(message: types.Message):
             adminList = DBH.GetAdmins()
             for i in adminList:
                 if not isShortVariant:
-                    await bot.send_message(i, "Started counting the number of members of all chats.", reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+                    await bot.send_message(i, "Started counting the number of members of all chats.",
+                                           reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
                 else:
-                    await bot.send_message(i, "Started counting the number of members of group chats.", reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+                    await bot.send_message(i, "Started counting the number of members of group chats.",
+                                           reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
             IsStartedCount = True
             CountUsers = 0
             listGC = DBH.GetGroupChatIDs()
@@ -206,11 +236,15 @@ async def CountVoid(message: types.Message):
                 IsStartedCount = False
             for i in adminList:
                 if not isShortVariant:
-                    await bot.send_message(i, "The number of members of all chats: " + str(CountUsers), reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+                    await bot.send_message(i, "The number of members of all chats: " + str(CountUsers),
+                                           reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
                 else:
-                    await bot.send_message(i, "The number of members of group chats: " + str(CountUsers), reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+                    await bot.send_message(i, "The number of members of group chats: " + str(CountUsers),
+                                           reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
         else:
-            await message.reply("The counting has already begun.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+            await message.reply("The counting has already begun.",
+                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                       messageData['chatType']))
 
 
 @dp.message_handler(commands=['newadmin'])
@@ -227,13 +261,21 @@ async def AddAdminVoid(message: types.Message):
                 DBH.AddAdmin(int(newAdminID))
                 ListOfAdmins = DBH.GetAdmins()
                 if newAdminID in ListOfAdmins:
-                    await message.reply("A new administrator has been successfully added.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                    await message.reply("A new administrator has been successfully added.",
+                                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                               messageData['chatType']))
                 else:
-                    await message.reply("Failed to add a new administrator.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                    await message.reply("Failed to add a new administrator.",
+                                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                               messageData['chatType']))
             else:
-                await message.reply("This ID is already on the list of administrators.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                await message.reply("This ID is already on the list of administrators.",
+                                    reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                           messageData['chatType']))
         else:
-            await message.reply("The ID should only contain numbers and possibly a minus.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+            await message.reply("The ID should only contain numbers and possibly a minus.",
+                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                       messageData['chatType']))
 
 
 @dp.message_handler(commands=['amount'])
@@ -245,8 +287,15 @@ async def AmountVoid(message: types.Message):
     if DBH.IsAdmin(messageData["fromUserId"]):
         chatStats = DBH.GetTimeStats()
         StatsByOneDay = DBH.GetStatsInPeriod(1)
-        answerMes = "For all the time:\nPM: " + str(chatStats['private']) + "\nGroups: " + str(chatStats['groups']) + "\n\nIn 24 hours:\nPM: " + str(StatsByOneDay['activePrivate']) + "\nGroups: " + str(StatsByOneDay['activeGroups']) + "\n\nIn a week:\nPM: " + str(chatStats['activePrivateWeek']) + "\nGroups: " + str(chatStats['activeGroupsWeek']) + "\n\nIn 30 days:\nPM: " + str(chatStats['activePrivateMonth']) + "\nGroups: " + str(chatStats['activeGroupsMonth'])
-        await message.reply(answerMes, reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+        answerMes = "For all the time:\nPM: " + str(chatStats['private']) + "\nGroups: " + str(
+            chatStats['groups']) + "\n\nIn 24 hours:\nPM: " + str(
+            StatsByOneDay['activePrivate']) + "\nGroups: " + str(
+            StatsByOneDay['activeGroups']) + "\n\nIn a week:\nPM: " + str(
+            chatStats['activePrivateWeek']) + "\nGroups: " + str(
+            chatStats['activeGroupsWeek']) + "\n\nIn 30 days:\nPM: " + str(
+            chatStats['activePrivateMonth']) + "\nGroups: " + str(chatStats['activeGroupsMonth'])
+        await message.reply(answerMes, reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                              messageData['chatType']))
 
 
 @dp.message_handler(commands=['plotamount'])
@@ -258,15 +307,20 @@ async def PlotAmountVoid(message: types.Message):
     if DBH.IsAdmin(messageData["fromUserId"]):
         chartData = DBH.GetStatsForChart()
         chartsNames = ["generalAmount", "activeWeek", "activeMonth"]
-        BuildChartAmount(chartData['privateChatsAmount'], chartData['groupChatsAmount'], chartData['dates'], "privateChatsAmount", "groupChatsAmount", chartsNames[0])
-        BuildChartAmount(chartData['activeWeekPrivateChats'], chartData['activeWeekGroupChats'], chartData['dates'], "activeWeekPrivateChats", "activeWeekGroupChats", chartsNames[1])
-        BuildChartAmount(chartData['activeMonthPrivateChats'], chartData['activeMonthGroupChats'], chartData['dates'], "activeMonthPrivateChats", "activeMonthGroupChats", chartsNames[2])
+        BuildChartAmount(chartData['privateChatsAmount'], chartData['groupChatsAmount'], chartData['dates'],
+                         "privateChatsAmount", "groupChatsAmount", chartsNames[0])
+        BuildChartAmount(chartData['activeWeekPrivateChats'], chartData['activeWeekGroupChats'],
+                         chartData['dates'], "activeWeekPrivateChats", "activeWeekGroupChats", chartsNames[1])
+        BuildChartAmount(chartData['activeMonthPrivateChats'], chartData['activeMonthGroupChats'],
+                         chartData['dates'], "activeMonthPrivateChats", "activeMonthGroupChats",
+                         chartsNames[2])
         media = types.MediaGroup()
         media.attach_document(types.InputFile('generalAmount.png'))
         media.attach_document(types.InputFile('activeWeek.png'))
         media.attach_document(types.InputFile('activeMonth.png'))
         await message.reply_media_group(media=media)
         DeleteCharts(chartsNames)
+
 
 @dp.message_handler(commands=['stats'])
 async def StatsVoid(message: types.Message):
@@ -291,9 +345,14 @@ async def StatsVoid(message: types.Message):
             uniqueUsersToday = 0
         uniqueUsersLastWeek = DBH.GetBotUniqueUsersLastWeek()
         uniqueUsersThisMonth = DBH.GetBotUniqueUsersLastMonth()
-        answerMes = "Bot activity:\n\nToday: " + str(usageToday) + "\nIn the last week: " + str(usageLastWeek) + "\nIn the last month: " + str(usageLastMonth) + "\n\nUnique users:\n\nToday: " + str(uniqueUsersToday) + "\nIn the last week: " + str(uniqueUsersLastWeek) + "\nIn the last month: " + str(uniqueUsersThisMonth)
-        await message.reply(answerMes, reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
-        
+        answerMes = "Bot activity:\n\nToday: " + str(usageToday) + "\nIn the last week: " + str(
+            usageLastWeek) + "\nIn the last month: " + str(
+            usageLastMonth) + "\n\nUnique users:\n\nToday: " + str(
+            uniqueUsersToday) + "\nIn the last week: " + str(
+            uniqueUsersLastWeek) + "\nIn the last month: " + str(uniqueUsersThisMonth)
+        await message.reply(answerMes, reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                              messageData['chatType']))
+
 
 @dp.message_handler(commands=['plotstats'])
 async def PlotStatsVoid(message: types.Message):
@@ -330,31 +389,45 @@ async def PlotStatsVoid(message: types.Message):
 
         for i in botUsageLastWeekByHour:
             botUsageLastWeekByHour[i] = botUsageLastWeekByHour[i] / 60
-        chartsNames = ["botUsageAllTimeByDay", "botUniqueUsersAllTimeByDay", "botUniqueUsersAllTimeByMonth", "botUsageLastDayByMinute", "botUsageLastWeekByHour", "botUsageLastMonthByDay", "langDistributionUsers", "langDistributionPercentage", "langActivityCalls", "langActivityPercentage"]
-        BuildChart(list(botUsageAllTimeByDay.values()), list(botUsageAllTimeByDay.keys()), "Bot usage for all time by day", "Calls per day", chartsNames[0])
+        chartsNames = ["botUsageAllTimeByDay", "botUniqueUsersAllTimeByDay", "botUniqueUsersAllTimeByMonth",
+                       "botUsageLastDayByMinute", "botUsageLastWeekByHour", "botUsageLastMonthByDay",
+                       "langDistributionUsers", "langDistributionPercentage", "langActivityCalls",
+                       "langActivityPercentage"]
+        BuildChart(list(botUsageAllTimeByDay.values()), list(botUsageAllTimeByDay.keys()),
+                   "Bot usage for all time by day", "Calls per day", chartsNames[0])
         # for day, users in botUniqueUsersAllTimeByDay.items():
         #     botUniqueUsersAllTimeByDay[day] = len(users)
-        BuildChart(list(botUniqueUsersAllTimeByDay.values()), list(botUniqueUsersAllTimeByDay.keys()), "Bot unique users for all time by day", "Users per day", chartsNames[1])
+        BuildChart(list(botUniqueUsersAllTimeByDay.values()), list(botUniqueUsersAllTimeByDay.keys()),
+                   "Bot unique users for all time by day", "Users per day", chartsNames[1])
         # for month, users in botUniqueUsersAllTimeByMonth.items():
         #     botUniqueUsersAllTimeByMonth[month] = len(users)
-        BuildChart(list(botUniqueUsersAllTimeByMonth.values()), list(botUniqueUsersAllTimeByMonth.keys()), "Bot unique users for all time by month", "Users per month", chartsNames[2])
-        BuildChart(list(botUsageLastDayByMinute.values()), list(botUsageLastDayByMinute.keys()), "Bot usage today by minute", "Calls per minute", chartsNames[3])
-        BuildChart(list(botUsageLastWeekByHour.values()), list(botUsageLastWeekByHour.keys()), "Bot usage last week by hour", "Calls per minute", chartsNames[4])
-        BuildChart(list(botUsageLastMonthByDay.values()), list(botUsageLastMonthByDay.keys()), "Bot usage last month by day", "Calls per day", chartsNames[5])
-        BuildBarChart(list(langDistribution.keys()), list(langDistribution.values()), "Language distribution", "Users", chartsNames[6])
+        BuildChart(list(botUniqueUsersAllTimeByMonth.values()), list(botUniqueUsersAllTimeByMonth.keys()),
+                   "Bot unique users for all time by month", "Users per month", chartsNames[2])
+        BuildChart(list(botUsageLastDayByMinute.values()), list(botUsageLastDayByMinute.keys()),
+                   "Bot usage today by minute", "Calls per minute", chartsNames[3])
+        BuildChart(list(botUsageLastWeekByHour.values()), list(botUsageLastWeekByHour.keys()),
+                   "Bot usage last week by hour", "Calls per minute", chartsNames[4])
+        BuildChart(list(botUsageLastMonthByDay.values()), list(botUsageLastMonthByDay.keys()),
+                   "Bot usage last month by day", "Calls per day", chartsNames[5])
+        BuildBarChart(list(langDistribution.keys()), list(langDistribution.values()), "Language distribution",
+                      "Users", chartsNames[6])
         for lang, count in langDistribution.items():
             langDistribution[lang] = count / totalUsers * 100
-        BuildBarChart(list(langDistribution.keys()), list(langDistribution.values()), "Language distribution", "Percentage", chartsNames[7])
-        BuildBarChart(list(langActivity.keys()), list(langActivity.values()), "Language activity", "Calls", chartsNames[8])
+        BuildBarChart(list(langDistribution.keys()), list(langDistribution.values()), "Language distribution",
+                      "Percentage", chartsNames[7])
+        BuildBarChart(list(langActivity.keys()), list(langActivity.values()), "Language activity", "Calls",
+                      chartsNames[8])
         for lang, count in langActivity.items():
             langActivity[lang] = count / allRecordsCount * 100
-        BuildBarChart(list(langActivity.keys()), list(langActivity.values()), "Language activity", "Percentage", chartsNames[9])
+        BuildBarChart(list(langActivity.keys()), list(langActivity.values()), "Language activity",
+                      "Percentage", chartsNames[9])
         media = types.MediaGroup()
         for i in chartsNames:
             media.attach_document(types.InputFile(i + ".png"))
         await message.reply_media_group(media=media)
         DeleteCharts(chartsNames)
         Print("Plotting stats took " + str(time.time() - startTime) + " seconds.", "S")
+
 
 @dp.message_handler(commands=['backup'])
 async def BackupVoid(message: types.Message):
@@ -370,9 +443,13 @@ async def BackupVoid(message: types.Message):
                 backupFile = open(nameOfBackup, 'rb')
                 await bot.send_document(messageData["chatID"], backupFile)
             except:
-                await message.reply("The file sending failed.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                await message.reply("The file sending failed.",
+                                    reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                           messageData['chatType']))
         else:
-            await message.reply("The file is too big. Its weight is " + str(fileSize) + " bytes.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+            await message.reply("The file is too big. Its weight is " + str(fileSize) + " bytes.",
+                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                       messageData['chatType']))
 
 
 @dp.message_handler(commands=['unban'])
@@ -388,13 +465,21 @@ async def UnbanVoid(message: types.Message):
             if DBH.IsBlacklisted(int(unbanID)):
                 RemoveFromBlackList(int(unbanID))
                 if not DBH.IsBlacklisted(int(unbanID)):
-                    await message.reply("User/group has been successfully unblocked.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                    await message.reply("User/group has been successfully unblocked.",
+                                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                               messageData['chatType']))
                 else:
-                    await message.reply("Failed to unblock user/group.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                    await message.reply("Failed to unblock user/group.",
+                                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                               messageData['chatType']))
             else:
-                await message.reply("This user/group is not in a black list.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                await message.reply("This user/group is not in a black list.",
+                                    reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                           messageData['chatType']))
         else:
-            await message.reply("The ID should only contain numbers and minus.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+            await message.reply("The ID should only contain numbers and minus.",
+                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                       messageData['chatType']))
 
 
 @dp.message_handler(commands=['ban'])
@@ -410,13 +495,21 @@ async def UnbanVoid(message: types.Message):
             if not DBH.IsBlacklisted(int(banID)):
                 AddToBlackList(int(banID), messageData["fromUserId"], messageData["chatName"])
                 if DBH.IsBlacklisted(int(banID)):
-                    await message.reply("User/group successfully blocked.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                    await message.reply("User/group successfully blocked.",
+                                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                               messageData['chatType']))
                 else:
-                    await message.reply("Failed to block a user/chat.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                    await message.reply("Failed to block a user/chat.",
+                                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                               messageData['chatType']))
             else:
-                await message.reply("This user/group is already in the black list.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+                await message.reply("This user/group is already in the black list.",
+                                    reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                           messageData['chatType']))
         else:
-            await message.reply("The ID should only contain numbers and minus.", reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+            await message.reply("The ID should only contain numbers and minus.",
+                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                       messageData['chatType']))
 
 
 @dp.message_handler(commands=['chats'])
@@ -430,10 +523,11 @@ async def ChatsVoid(message: types.Message):
             for chat in DBH.GetChatIDs():
                 file.write(str(chat) + "\n")
         await bot.send_document(messageData["chatID"], types.InputFile("chats.txt"))
-        os.remove("chats.txt")         
+        os.remove("chats.txt")
+
+    # Technical commands
 
 
-# Technical commands
 @dp.message_handler(commands=['start'])
 async def StartVoid(message: types.Message):
     messageData = GetDataFromMessage(message)
@@ -453,9 +547,11 @@ async def StartVoid(message: types.Message):
                 if i['code'] == userLang:
                     lang = i['botCode']
                     break
-            
+
             DBH.SetSetting(messageData["chatID"], "lang", lang, messageData["chatType"])
-            await message.reply(GetText(messageData["chatID"], "main_settings_menu", messageData["chatType"]), reply_markup=CustomMarkup.SettingsMarkup(messageData['chatID'], messageData['chatType']))
+            await message.reply(GetText(messageData["chatID"], "main_settings_menu", messageData["chatType"]),
+                                reply_markup=CustomMarkup.SettingsMarkup(messageData['chatID'],
+                                                                         messageData['chatType']))
 
 
 # Phrase/Answer add command
@@ -467,11 +563,12 @@ async def AddPhrase(message: types.Message):
         return
 
     msg = message.text.replace("/addpa ", "")
-    trigger_answer = msg.split(":")
+    trigger_answer = msg.split(":")  # trigger - 0, answer - 1
     if len(trigger_answer) != 2 or " " in trigger_answer[0]:
         reply_message = 'Use this command like this: /addpa kuzel:amd gay'
     else:
-        result = DBH.addPhrase(messageData["chatID"], trigger_answer[0], trigger_answer[1])
+        result = DBH.addPhrase(messageData["chatID"], trigger_answer[0],
+                               trigger_answer[1], messageData["fromUserId"])
         if result:
             reply_message = f'Added trigger <b>{trigger_answer[0]}</b> and answer <b>{trigger_answer[1]}</b>'
         else:
@@ -480,8 +577,7 @@ async def AddPhrase(message: types.Message):
     await message.reply(reply_message, parse_mode="HTML",
                         disable_web_page_preview=True,
                         reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                               messageData[
-                                                                   'chatType']))
+                                                               messageData['chatType']))
 
 
 # Phrase/Answer add command
@@ -492,20 +588,44 @@ async def DeletePhrase(message: types.Message):
     if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
         return
 
-    trigger_answer = message.text.replace("/delpa ", "")
-    if " " in trigger_answer:
-        reply_message = 'Use this command like this: /delpa kuzel'
-    else:
-        result = DBH.delPhrase(messageData["chatID"], trigger_answer)
-        if result:
-            reply_message = f'Trigger <b>{trigger_answer}</b> is deleted'
-        else:
-            reply_message = "This trigger is not found"
+    trigger = message.text.replace("/delpa ", "")
 
-    await message.reply(reply_message, parse_mode="HTML",
-                        disable_web_page_preview=True,
-                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                               messageData['chatType']))
+    is_phrase_author = DBH.isPhraseAuthor(messageData["chatID"], trigger, messageData["fromUserId"])
+    print(is_phrase_author)
+    if is_phrase_author is None:
+        return await trig_answ_reply("This trigger is not found", message)
+
+    is_admin = await trig_is_admin(message)
+    print(is_admin)
+    if is_admin is False and is_phrase_author is False:
+        return await trig_answ_reply("You don't have permissions to do this", message)
+
+    if " " in trigger:
+        return await trig_answ_reply('Use this command like this: /delpa kuzel', message)
+
+    result = DBH.delPhrase(messageData["chatID"], trigger)
+    if result:
+        return await trig_answ_reply(f'Trigger <b>{trigger}</b> is deleted', message)
+
+
+async def trig_answ_reply(text, message):
+    message_data = GetDataFromMessage(message)
+    await message.reply(
+        text,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+        reply_markup=CustomMarkup.DeleteMarkup(message_data['chatID'], message_data['chatType'])
+    )
+
+
+async def trig_is_admin(message):
+    messageData = GetDataFromMessage(message)
+    member = await message.chat.get_member(messageData["fromUserId"])
+    if DBH.IsAdmin(messageData["fromUserId"]) \
+            or member.status == "creator" \
+            or member.status == "administrator":
+        return True
+    return False
 
 
 # Main void
@@ -520,7 +640,8 @@ async def MainVoid(message: types.Message):
 
     # Checking if a user is on the blacklist
     if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
-        Print("User (" + str(messageData["fromUserId"]) + ") is in the blacklist. Message: " + str(message.text), "L")
+        Print("User (" + str(messageData["fromUserId"]) + ") is in the blacklist. Message: " + str(
+            message.text), "L")
         return
 
     # Get message text
@@ -550,7 +671,7 @@ async def MainVoid(message: types.Message):
     except:
         Print("Error SpecialSplit(). Message: " + OriginalMessageText, "E")
         return
-    
+
     Print("After MessagePreparation(): " + MessageText, "L")
 
     # Preparing a message for searching currencies
@@ -582,28 +703,36 @@ async def MainVoid(message: types.Message):
     if NumArray == [[], [], [], []]:
         return
 
-    if StopDDoS.updateData(messageData["fromUserId"], messageData["chatID"], len(NumArray[1]) + len(NumArray[3]), message.chat.title):
+    if StopDDoS.updateData(messageData["fromUserId"], messageData["chatID"],
+                           len(NumArray[1]) + len(NumArray[3]), message.chat.title):
         await message.reply(GetText(messageData["chatID"], 'added_to_bl', messageData["chatType"]))
         ListAdmins = DBH.GetAdmins()
         for i in ListAdmins:
-            await bot.send_message(i, "User @" + str(message.from_user.username) + " id: " + str(messageData["fromUserId"]) + " is blocked.", reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
+            await bot.send_message(i, "User @" + str(message.from_user.username) + " id: " + str(
+                messageData["fromUserId"]) + " is blocked.",
+                                   reply_markup=CustomMarkup.DeleteMarkup(i, "private"))
         return
 
     result = AnswerText(NumArray, messageData["chatID"], messageData["chatType"])
     endtime = time.time()
     Print("Time: " + str(endtime - starttime), "L")
     try:
-        reply_message = await message.reply(result, parse_mode="HTML", disable_web_page_preview=True, reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType']))
+        reply_message = await message.reply(result, parse_mode="HTML", disable_web_page_preview=True,
+                                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                                   messageData['chatType']))
         DBH.UpdateChatUsage(messageData["chatID"])
-        DBH.NewProcessedCurrency(messageData["chatID"], messageData["fromUserId"], message.from_user.language_code, ','.join(NumArray[1]+NumArray[3]), ','.join(DBH.GetAllCurrencies(messageData["chatID"]) + DBH.GetAllCrypto(messageData["chatID"])), reply_message.message_id)
+        DBH.NewProcessedCurrency(messageData["chatID"], messageData["fromUserId"],
+                                 message.from_user.language_code, ','.join(NumArray[1] + NumArray[3]),
+                                 ','.join(DBH.GetAllCurrencies(messageData["chatID"]) + DBH.GetAllCrypto(
+                                     messageData["chatID"])), reply_message.message_id)
     except:
         Print("Cannot send message. Chat ID: " + str(message.chat.id) +
               " | Chat name: " + str(message.chat.title) +
-              " | Chat username: " + 
-              str(message.chat.username) + 
-              " | Chat type: "+str(message.chat.type), "E")
-    
-    
+              " | Chat username: " +
+              str(message.chat.username) +
+              " | Chat type: " + str(message.chat.type), "E")
+
+
 # Callbacks
 @dp.callback_query_handler(lambda call: True)
 async def CallbackAnswer(call: types.CallbackQuery):
@@ -633,18 +762,22 @@ async def CallbackAnswer(call: types.CallbackQuery):
                     if member.status == 'creator':
                         CanUserDeleteMes = True
                 elif allAdmins == False:
-                    if whoCanDeleteMes == 'admins' and (member.status == "administrator" or member.status == "creator") or whoCanDeleteMes == 'creator' and member.status == "creator" or whoCanDeleteMes == 'everybody':
+                    if whoCanDeleteMes == 'admins' and (
+                            member.status == "administrator" or member.status == "creator") or whoCanDeleteMes == 'creator' and member.status == "creator" or whoCanDeleteMes == 'everybody':
                         CanUserDeleteMes = True
             elif chatType == "supergroup":
                 try:
                     member = await call.message.chat.get_member(fromUserId)
-                    if whoCanDeleteMes == 'admins' and (member.status == "administrator" or member.status == "creator") or whoCanDeleteMes == 'creator' and member.status == "creator" or whoCanDeleteMes == 'everybody':
+                    if whoCanDeleteMes == 'admins' and (
+                            member.status == "administrator" or member.status == "creator") or whoCanDeleteMes == 'creator' and member.status == "creator" or whoCanDeleteMes == 'everybody':
                         CanUserDeleteMes = True
                 except:
                     pass
         if CanUserDeleteMes:
-            try: 
-                await bot.edit_message_text(call.message.text + "\n\n@" + str(call.from_user.username) + " (id: " + str(fromUserId) + ")" + " delete it.", chatID, call.message.message_id)
+            try:
+                await bot.edit_message_text(
+                    call.message.text + "\n\n@" + str(call.from_user.username) + " (id: " + str(
+                        fromUserId) + ")" + " delete it.", chatID, call.message.message_id)
                 await call.message.delete()
                 DBH.DeleteProcessedCurrency(chatID, call.message.message_id)
 
@@ -663,7 +796,9 @@ async def CallbackAnswer(call: types.CallbackQuery):
             DBH.SetSetting(chatID, 'deleteButton', int(not IsFlag), chatType)
         else:
             DBH.SetSetting(chatID, 'deleteRules', Value, chatType)
-        await bot.edit_message_text(GetText(chatID, 'delete_button_menu', chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.DeleteButtonMenuMarkup(chatID, chatType))
+        await bot.edit_message_text(GetText(chatID, 'delete_button_menu', chatType), chatID,
+                                    call.message.message_id, parse_mode="HTML",
+                                    reply_markup=CustomMarkup.DeleteButtonMenuMarkup(chatID, chatType))
 
     elif str(callData).find("lang_") == 0:
         member = await call.message.chat.get_member(fromUserId)
@@ -675,7 +810,9 @@ async def CallbackAnswer(call: types.CallbackQuery):
             pass
         else:
             DBH.SetSetting(chatID, 'lang', Value, chatType)
-        await bot.edit_message_text(GetText(chatID, 'lang_menu', chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.LanguageMenuMarkup(chatID, chatType))
+        await bot.edit_message_text(GetText(chatID, 'lang_menu', chatType), chatID, call.message.message_id,
+                                    parse_mode="HTML",
+                                    reply_markup=CustomMarkup.LanguageMenuMarkup(chatID, chatType))
 
     elif str(callData).find("ui_") == 0:
         member = await call.message.chat.get_member(fromUserId)
@@ -692,7 +829,9 @@ async def CallbackAnswer(call: types.CallbackQuery):
             IsSymbol = DBH.GetSetting(chatID, 'currencySymbol', chatType)
             DBH.SetSetting(chatID, 'currencySymbol', int(not IsSymbol), chatType)
         Print(GetText(chatID, 'mes_view_menu', chatType), "L")
-        await bot.edit_message_text(GetText(chatID, 'mes_view_menu', chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.MessageViewMarkup(chatID, chatType))
+        await bot.edit_message_text(GetText(chatID, 'mes_view_menu', chatType), chatID,
+                                    call.message.message_id, parse_mode="HTML",
+                                    reply_markup=CustomMarkup.MessageViewMarkup(chatID, chatType))
 
     elif str(callData).find("edit_") == 0:
         member = await call.message.chat.get_member(fromUserId)
@@ -710,7 +849,9 @@ async def CallbackAnswer(call: types.CallbackQuery):
                 DBH.SetSetting(chatID, 'editSettings', Value, chatType)
             elif memberStatus == "creator":
                 DBH.SetSetting(chatID, 'editSettings', Value, chatType)
-        await bot.edit_message_text(GetText(chatID, 'edit_menu', chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.EditMenuMarkup(chatID, chatType))
+        await bot.edit_message_text(GetText(chatID, 'edit_menu', chatType), chatID, call.message.message_id,
+                                    parse_mode="HTML",
+                                    reply_markup=CustomMarkup.EditMenuMarkup(chatID, chatType))
 
     elif str(callData).find("cur_ignore_") == 0:
         member = await call.message.chat.get_member(fromUserId)
@@ -721,22 +862,45 @@ async def CallbackAnswer(call: types.CallbackQuery):
         Value = str(callData)[0:len(str(callData))]
 
         if Value == "menu":
-            await bot.edit_message_text(GetText(chatID, "ignore_currencies_mainmenu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.IgnoreCurrenciesMainMenuMarkup(chatID, chatType))
+            await bot.edit_message_text(GetText(chatID, "ignore_currencies_mainmenu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.IgnoreCurrenciesMainMenuMarkup(chatID,
+                                                                                                 chatType))
         elif Value == "cryptomenu":
-            await bot.edit_message_text(GetText(chatID, "ignore_crypto_mainmenu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.IgnoreCryptoMenuMarkup(chatID, chatType))
+            await bot.edit_message_text(GetText(chatID, "ignore_crypto_mainmenu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.IgnoreCryptoMenuMarkup(chatID, chatType))
         elif Value == "curmenu":
-            await bot.edit_message_text(GetText(chatID, "ignore_currencies_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.IgnoreCurrenciesMenuMarkup(chatID, chatType))
+            await bot.edit_message_text(GetText(chatID, "ignore_currencies_menu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.IgnoreCurrenciesMenuMarkup(chatID,
+                                                                                             chatType))
         elif len(Value) == 1 or len(Value) == 2:
-            await bot.edit_message_text(GetText(chatID, "ignore_letter_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.IgnoreCurrenciesSetupMarkup(chatID, chatType, Value))
+            await bot.edit_message_text(GetText(chatID, "ignore_letter_menu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.IgnoreCurrenciesSetupMarkup(chatID,
+                                                                                              chatType,
+                                                                                              Value))
         elif len(Value) == 3 or len(Value) == 4:
             DBH.SetIgnoredCurrency(chatID, Value, not DBH.GetIgnoredCurrency(chatID, Value))
             DBH.ReverseCurrencySetting(chatID, Value)
             if Value in ListsCache.GetListOfCrypto():
-                await bot.edit_message_text(GetText(chatID, "ignore_crypto_mainmenu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.IgnoreCryptoMenuMarkup(chatID, chatType))
+                await bot.edit_message_text(GetText(chatID, "ignore_crypto_mainmenu", chatType), chatID,
+                                            call.message.message_id, parse_mode="HTML",
+                                            reply_markup=CustomMarkup.IgnoreCryptoMenuMarkup(chatID,
+                                                                                             chatType))
             else:
-                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh', 'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm',
-                             'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu', 'U': 'tu', 'V': 'vz', 'W': 'vz', 'X': 'vz', 'Y': 'vz', 'Z': 'vz'}
-                await bot.edit_message_text(GetText(chatID, "ignore_letter_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.IgnoreCurrenciesSetupMarkup(chatID, chatType, dictForMU[Value[0]]))
+                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh',
+                             'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm',
+                             'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu',
+                             'U': 'tu', 'V': 'vz', 'W': 'vz', 'X': 'vz', 'Y': 'vz', 'Z': 'vz'}
+                await bot.edit_message_text(GetText(chatID, "ignore_letter_menu", chatType), chatID,
+                                            call.message.message_id, parse_mode="HTML",
+                                            reply_markup=CustomMarkup.IgnoreCurrenciesSetupMarkup(chatID,
+                                                                                                  chatType,
+                                                                                                  dictForMU[
+                                                                                                      Value[
+                                                                                                          0]]))
 
     elif str(callData).find("cur_") == 0:
         member = await call.message.chat.get_member(fromUserId)
@@ -747,24 +911,43 @@ async def CallbackAnswer(call: types.CallbackQuery):
         Value = str(callData)[Index:len(str(callData))]
 
         if Value == "menu":
-            await bot.edit_message_text(GetText(chatID, "currencies_mainmenu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.CurrenciesMainMenuMarkup(chatID, chatType))
+            await bot.edit_message_text(GetText(chatID, "currencies_mainmenu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.CurrenciesMainMenuMarkup(chatID, chatType))
         elif Value == "cryptomenu":
-            await bot.edit_message_text(GetText(chatID, "crypto_mainmenu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.CryptoMenuMarkup(chatID, chatType))
+            await bot.edit_message_text(GetText(chatID, "crypto_mainmenu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.CryptoMenuMarkup(chatID, chatType))
         elif Value == "curmenu":
-            await bot.edit_message_text(GetText(chatID, "currencies_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.CurrenciesMenuMarkup(chatID, chatType))
+            await bot.edit_message_text(GetText(chatID, "currencies_menu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.CurrenciesMenuMarkup(chatID, chatType))
         elif len(Value) == 1 or len(Value) == 2:
-            await bot.edit_message_text(GetText(chatID, "letter_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.CurrenciesSetupMarkup(chatID, chatType, Value))
+            await bot.edit_message_text(GetText(chatID, "letter_menu", chatType), chatID,
+                                        call.message.message_id, parse_mode="HTML",
+                                        reply_markup=CustomMarkup.CurrenciesSetupMarkup(chatID, chatType,
+                                                                                        Value))
         elif len(Value) == 3 or len(Value) == 4:
             DBH.ReverseCurrencySetting(chatID, Value)
             if Value in ListsCache.GetListOfCrypto():
-                await bot.edit_message_text(GetText(chatID, "crypto_mainmenu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.CryptoMenuMarkup(chatID, chatType))
+                await bot.edit_message_text(GetText(chatID, "crypto_mainmenu", chatType), chatID,
+                                            call.message.message_id, parse_mode="HTML",
+                                            reply_markup=CustomMarkup.CryptoMenuMarkup(chatID, chatType))
             else:
-                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh', 'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm',
-                             'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu', 'U': 'tu', 'V': 'vz', 'W': 'vz', 'X': 'vz', 'Y': 'vz', 'Z': 'vz'}
-                await bot.edit_message_text(GetText(chatID, "letter_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.CurrenciesSetupMarkup(chatID, chatType, dictForMU[Value[0]]))
+                dictForMU = {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'df', 'E': 'df', 'F': 'df', 'G': 'gh',
+                             'H': 'gh', 'I': 'ij', 'J': 'ij', 'K': 'kl', 'L': 'kl', 'M': 'm',
+                             'N': 'nq', 'O': 'nq', 'P': 'nq', 'Q': 'nq', 'R': 'rs', 'S': 'rs', 'T': 'tu',
+                             'U': 'tu', 'V': 'vz', 'W': 'vz', 'X': 'vz', 'Y': 'vz', 'Z': 'vz'}
+                await bot.edit_message_text(GetText(chatID, "letter_menu", chatType), chatID,
+                                            call.message.message_id, parse_mode="HTML",
+                                            reply_markup=CustomMarkup.CurrenciesSetupMarkup(chatID, chatType,
+                                                                                            dictForMU[
+                                                                                                Value[0]]))
 
     elif callData == "settings":
-        await bot.edit_message_text(GetText(chatID, "main_settings_menu", chatType), chatID, call.message.message_id, parse_mode="HTML", reply_markup=CustomMarkup.SettingsMarkup(chatID, chatType))
+        await bot.edit_message_text(GetText(chatID, "main_settings_menu", chatType), chatID,
+                                    call.message.message_id, parse_mode="HTML",
+                                    reply_markup=CustomMarkup.SettingsMarkup(chatID, chatType))
 
 
 def CheckArgument(key: str, value: str) -> bool:
@@ -793,26 +976,32 @@ def CheckArgument(key: str, value: str) -> bool:
         print("Error. Unknow argument '{}'".format(key))
     return isAllOkArg
 
-def BuildChartAmount(firstArr: list[int], secondArr: list[int], dates: list[str], firstLabel: str, secondLabel: str, chartName: str):
-    date_interval = int((datetime.datetime.strptime(dates[-1], '%Y-%m-%d') - datetime.datetime.strptime(dates[0], '%Y-%m-%d')).days / 10)
+
+def BuildChartAmount(firstArr: list[int], secondArr: list[int], dates: list[str], firstLabel: str,
+                     secondLabel: str, chartName: str):
+    date_interval = int((datetime.datetime.strptime(dates[-1], '%Y-%m-%d') - datetime.datetime.strptime(
+        dates[0], '%Y-%m-%d')).days / 10)
     if date_interval < 1:
         date_interval = 1
     dates = [datetime.datetime.strptime(date_str, "%Y-%m-%d") for date_str in dates]
-    plt.figure(figsize=(16,9))
+    plt.figure(figsize=(16, 9))
     plt.plot(dates, firstArr, label=firstLabel)
     plt.plot(dates, secondArr, label=secondLabel)
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=date_interval))
     plt.grid()
-    plt.legend()        
+    plt.legend()
     plt.savefig(chartName + '.png')
     plt.clf()
 
+
 def BuildChart(arr: list[int], dates: list[str], label: str, labely: str, chartName: str):
-    plt.figure(figsize=(16,9))
+    plt.figure(figsize=(16, 9))
     if label.find("by day") != -1:
         try:
-            date_interval = int((datetime.datetime.strptime(dates[-1], '%Y-%m-%d') - datetime.datetime.strptime(dates[0], '%Y-%m-%d')).days / 10)
+            date_interval = int((datetime.datetime.strptime(dates[-1],
+                                                            '%Y-%m-%d') - datetime.datetime.strptime(dates[0],
+                                                                                                     '%Y-%m-%d')).days / 10)
             if date_interval < 1:
                 date_interval = 1
         except:
@@ -841,15 +1030,16 @@ def BuildChart(arr: list[int], dates: list[str], label: str, labely: str, chartN
         plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=date_interval))
     plt.ylabel(labely)
     plt.grid()
-    plt.legend()        
+    plt.legend()
     plt.savefig(chartName + '.png')
     plt.clf()
 
+
 def BuildBarChart(columns: list[str], values: list, label: str, labely: str, chartName: str):
-    #round values to 2 digits
+    # round values to 2 digits
     for i in range(len(values)):
         values[i] = round(values[i], 2)
-    plt.figure(figsize=(16,9))
+    plt.figure(figsize=(16, 9))
     plt.bar(columns, values, label=label)
     ax = plt.gca()
     ax.bar_label(ax.containers[0])
@@ -859,9 +1049,11 @@ def BuildBarChart(columns: list[str], values: list, label: str, labely: str, cha
     plt.savefig(chartName + '.png')
     plt.clf()
 
+
 def DeleteCharts(names: list[str]):
     for name in names:
         os.remove(name + '.png')
+
 
 def IsChatExist(chatID: str, chatType: str, chatName: str):
     if DBH.ChatExists(chatID):
@@ -871,6 +1063,7 @@ def IsChatExist(chatID: str, chatType: str, chatName: str):
         DBH.AddIDStats(chatID, chatType, chatName)
         DBH.AddIgnoredCurrency(chatID)
         return False
+
 
 def LoadDataForBot():
     DBH.DBIntegrityCheck()
@@ -895,6 +1088,7 @@ def RegularStats():
         Stats = DBH.GetSetTimeStats()
         time.sleep(86400)
 
+
 def save_error_to_file(exception_type, exception_value, exception_traceback):
     with open('error_log.txt', 'a') as file:
         file.write(f"Exception Type: {exception_type}\n")
@@ -902,8 +1096,9 @@ def save_error_to_file(exception_type, exception_value, exception_traceback):
         file.write("Traceback:\n")
         traceback.print_tb(exception_traceback, file=file)
 
-def exception_handler(exception_type, exception_value, exception_traceback):    
-    logging.error("An error occurred", exc_info=(exception_type, exception_value, exception_traceback))    
+
+def exception_handler(exception_type, exception_value, exception_traceback):
+    logging.error("An error occurred", exc_info=(exception_type, exception_value, exception_traceback))
     save_error_to_file(exception_type, exception_value, exception_traceback)
 
 
@@ -911,14 +1106,14 @@ if __name__ == '__main__':
     sys.excepthook = exception_handler
 
     logging.basicConfig(
-        level=logging.ERROR,  
-        filename='error_log.txt',  
-        filemode='w',  
-        format='\n=================================\n%(asctime)s - %(levelname)s - %(message)s'  
+        level=logging.ERROR,
+        filename='error_log.txt',
+        filemode='w',
+        format='\n=================================\n%(asctime)s - %(levelname)s - %(message)s'
     )
 
-    LoadDataForBot()    
-    
+    LoadDataForBot()
+
     if len(sys.argv) == 3:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
             Print("Error arg.", "E")
@@ -930,7 +1125,8 @@ if __name__ == '__main__':
         elif not CheckArgument(sys.argv[3], sys.argv[4]):
             Print("Error arg.", "E")
             sys.exit()
-    elif len(sys.argv) == 7 and sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != sys.argv[3]:
+    elif len(sys.argv) == 7 and sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != \
+            sys.argv[3]:
         if not CheckArgument(sys.argv[1], sys.argv[2]):
             Print("Error arg.", "E")
             sys.exit()
@@ -940,7 +1136,8 @@ if __name__ == '__main__':
         elif not CheckArgument(sys.argv[5], sys.argv[6]):
             Print("Error arg.", "E")
             sys.exit()
-    elif len(sys.argv) == 5 and not sys.argv[1] != sys.argv[3] or len(sys.argv) == 7 and not (sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != sys.argv[3]):
+    elif len(sys.argv) == 5 and not sys.argv[1] != sys.argv[3] or len(sys.argv) == 7 and not (
+            sys.argv[1] != sys.argv[3] and sys.argv[1] != sys.argv[2] and sys.argv[2] != sys.argv[3]):
         Print("Error. Duplicate argument.", "E")
         sys.exit()
 

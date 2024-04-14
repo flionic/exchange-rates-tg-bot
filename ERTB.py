@@ -471,7 +471,7 @@ async def AddPhrase(message: types.Message):
     if len(trigger_answer) != 2 or " " in trigger_answer[0]:
         reply_message = 'Use this command like this: /addpa kuzel:amd gay'
     else:
-        result = DBH.addPhrase(messageData["chatID"], trigger_answer[0].lower(), trigger_answer[1])
+        result = DBH.addPhrase(messageData["chatID"], trigger_answer[0], trigger_answer[1])
         if result:
             reply_message = f'Added trigger <b>{trigger_answer[0]}</b> and answer <b>{trigger_answer[1]}</b>'
         else:

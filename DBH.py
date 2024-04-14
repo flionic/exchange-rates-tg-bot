@@ -1395,7 +1395,7 @@ def addPhrase(chat_id, trigger, answer):
         if getPhrase(chat_id, trigger) is not None:
             return False
         cursor = con.cursor()
-        cursor.execute("INSERT INTO MemePhrases (chatID,trigger,answer) values (?,?,?)", (chat_id, trigger, answer))
+        cursor.execute("INSERT INTO MemePhrases (chatID,trigger,answer) values (?,?,?)", (chat_id, trigger.lower(), answer))
         con.commit()
         return True
 

@@ -480,9 +480,9 @@ async def MainVoid(message: types.Message):
     if MessageText is None or MessageText == "":
         return
 
-    match MessageText:
+    match str(MessageText).lower():
         case 'май':
-            custom_answer = 'Я пукну ты споймай'
+            custom_answer = 'я пукну ты споймай'
         case 'кужель':
             custom_answer = 'амд-гей'
         case 'ваза':

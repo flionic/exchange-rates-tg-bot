@@ -15,4 +15,4 @@ ERTB – exchange rates telegram bot.
 Актуальная версія: 3.0
 Дата апошняга абнаўлення: верасень 2023 года
 
-Зваротная сувязь: @ertb_support_bot
+Зваротная сувязь: @flionicj

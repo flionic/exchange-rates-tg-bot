@@ -6,4 +6,4 @@ Wenn Sie etwas über die Autoren, die Version, den Quellcode und/oder die Lizenz
 
 Wenn Sie die Ausgabewährungen oder die Rechte zum Löschen von Nachrichten ändern wollen, verwenden Sie den Befehl /settings.
 
-Wenn Sie einen Erkennungsfehler oder andere Fehlfunktionen feststellen oder einen Verbesserungsvorschlag haben, schreiben Sie uns bitte an den Rückmeldungsbot: @ertb_support_bot
+Wenn Sie einen Erkennungsfehler oder andere Fehlfunktionen feststellen oder einen Verbesserungsvorschlag haben, schreiben Sie uns bitte an den Rückmeldungsbot: @flionicj

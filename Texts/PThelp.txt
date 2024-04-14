@@ -6,4 +6,4 @@ Se você quiser saber mais sobre os autores, versão, código fonte e/ou licenç
 
 Se você quiser mudar quais moedas irão aparecer na resposta ou quem poderá deletar as mensagens, use o comando /settings.
 
-Se você perceber qualquer erro de reconhecimento, identificar problemas ou quiser dar uma sugestão para aprimoramento, por favor fale conosco em: @ertb_support_bot
+Se você perceber qualquer erro de reconhecimento, identificar problemas ou quiser dar uma sugestão para aprimoramento, por favor fale conosco em: @flionicj

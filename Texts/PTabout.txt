@@ -15,4 +15,4 @@ O código fonte original é aberto e distribuído sob a Licença MIT. Texto da l
 Versão atual: 3.0
 Data da última atualização: Setembro de 2023
 
-Feedback: @ertb_support_bot
+Feedback: @flionicj

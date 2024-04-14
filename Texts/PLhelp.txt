@@ -6,4 +6,4 @@ Jeśli chcesz wiedzieć o autorach, wersji, oryginalnym kodzie i/lub licencji, u
 
 Jeśli chcesz zmienić waluty wyjściowe lub uprawnienia do usunięcia wiadomości, użyj polecenia /settings.
 
-Jeśli zauważysz błąd rozpoznawania, inne usterki lub masz sugestie dotyczące ulepszeń, napisz do nas w bocie do informacji zwrotnej @ertb_support_bot
+Jeśli zauważysz błąd rozpoznawania, inne usterki lub masz sugestie dotyczące ulepszeń, napisz do nas w bocie do informacji zwrotnej @flionicj

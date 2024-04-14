@@ -15,4 +15,4 @@ Der Originalcode ist quelloffen und wird unter der MIT-Lizenz verbreitet. Text d
 Aktuelle Version: 3.0
 Letzte Aktualisierung: September 2023
 
-Rückmeldung: @ertb_support_bot
+Rückmeldung: @flionicj

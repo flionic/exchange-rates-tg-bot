@@ -15,4 +15,4 @@ The original code is open source and distributed under the MIT license. License 
 Current version: 3.0
 Date of last update: September 2023
 
-Feedback: @ertb_support_bot
+Feedback: @flionicj

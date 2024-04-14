@@ -6,4 +6,4 @@ If you want to know about the authors, version, source code, and/or license, use
 
 If you want to change the output currencies or the rights to delete messages, use the /settings command.
 
-If you notice a recognition error, other malfunctions, or have a suggestion for improvement, please write to us in the feedback bot: @ertb_support_bot
+If you notice a recognition error, other malfunctions, or have a suggestion for improvement, please write to us in the feedback bot: @flionicj

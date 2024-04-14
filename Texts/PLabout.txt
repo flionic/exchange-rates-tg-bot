@@ -16,4 +16,4 @@ Oryginalny kod jest open source i rozpowszechniany na licencji MIT. Tekst licenc
 Aktualna wersja: 3.0
 Data ostatniej aktualizacji: Wrzesień 2023 r.
 
-Informacja zwrotna: @ertb_support_bot
+Informacja zwrotna: @flionicj

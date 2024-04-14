@@ -471,7 +471,7 @@ async def AddPhrase(message: types.Message):
     if len(phrase_answer) != 2 or " " in phrase_answer[0]:
         reply_message = 'Use this command like this: /addpa kuzel:amd-gay'
     else:
-        result = DBH.addPhrase(messageData["chatID"], phrase_answer[0], phrase_answer[1])
+        result = DBH.addPhrase(messageData["chatID"], phrase_answer[0].lower(), phrase_answer[1])
         if result:
             reply_message = f'Added phrase <b>{phrase_answer[0]}</b> and answer <b>{phrase_answer[1]}</b>'
         else:

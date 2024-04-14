@@ -530,9 +530,10 @@ async def MainVoid(message: types.Message):
 
     if " " not in MessageText:
         phrase_answer = DBH.getPhrase(message.from_id, MessageText)
-        await message.reply(phrase_answer, parse_mode="HTML", disable_web_page_preview=True,
-                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                                   messageData['chatType']))
+        if phrase_answer:
+            await message.reply(phrase_answer, parse_mode="HTML", disable_web_page_preview=True,
+                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                       messageData['chatType']))
 
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)

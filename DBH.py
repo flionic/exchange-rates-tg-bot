@@ -1381,33 +1381,30 @@ def GetChatIDs():
 
 def getPhrase(chat_id, trigger):
     chat_id = int(chat_id)
-    con = sql.connect('DataBases/DataForBot.sqlite')
-    cursor = con.cursor()
-    cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
-    res = cursor.fetchone()
-    if res:
-        return res[3]
-    return res
-    # cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase,))
-    # res = cursor.fetchall()
-    # return [k[0] for k in res]
+    with sql.connect('DataBases/DataForBot.sqlite') as con:
+        cursor = con.cursor()
+        cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
+        res = cursor.fetchone()
+        if res:
+            return res[3]
+        return res
 
 def addPhrase(chat_id, trigger, answer):
     chat_id = int(chat_id)
-    con = sql.connect('DataBases/DataForBot.sqlite')
-    if getPhrase(chat_id, trigger) is not None:
-        return False
-    cursor = con.cursor()
-    cursor.execute("INSERT INTO MemePhrases (chatID,trigger,answer) values (?,?,?)", (chat_id, trigger, answer))
-    con.commit()
-    return True
+    with sql.connect('DataBases/DataForBot.sqlite') as con:
+        if getPhrase(chat_id, trigger) is not None:
+            return False
+        cursor = con.cursor()
+        cursor.execute("INSERT INTO MemePhrases (chatID,trigger,answer) values (?,?,?)", (chat_id, trigger, answer))
+        con.commit()
+        return True
 
 def delPhrase(chat_id, trigger):
     chat_id = int(chat_id)
-    con = sql.connect('DataBases/DataForBot.sqlite')
-    cursor = con.cursor()
-    if getPhrase(chat_id, trigger) is None:
-        return False
-    cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
-    con.commit()
-    return True
+    with sql.connect('DataBases/DataForBot.sqlite') as con:
+        cursor = con.cursor()
+        if getPhrase(chat_id, trigger) is None:
+            return False
+        cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
+        con.commit()
+        return True

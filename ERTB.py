@@ -480,6 +480,21 @@ async def MainVoid(message: types.Message):
     if MessageText is None or MessageText == "":
         return
 
+    match MessageText:
+        case 'май':
+            custom_answer = 'Я пукну ты споймай'
+        case 'кужель':
+            custom_answer = 'амд-гей'
+        case 'ваза':
+            custom_answer = 'твой батя начальник унитаза'
+        case _:
+            custom_answer = None
+
+    if custom_answer:
+        reply_message = await message.reply(custom_answer, parse_mode="HTML", disable_web_page_preview=True,
+                                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                                   messageData['chatType']))
+
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)
 

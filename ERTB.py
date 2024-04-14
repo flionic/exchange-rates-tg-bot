@@ -469,7 +469,7 @@ async def AddPhrase(message: types.Message):
     msg = message.text.replace("/addpa ", "")
     phrase_answer = msg.split(":")
     if len(phrase_answer) != 2 or " " in phrase_answer[0]:
-        reply_message = 'Use this command like this: /addpa kuzel:amd-gay'
+        reply_message = 'Use this command like this: /addpa kuzel:amd gay'
     else:
         result = DBH.addPhrase(messageData["chatID"], phrase_answer[0].lower(), phrase_answer[1])
         if result:

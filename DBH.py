@@ -1383,7 +1383,7 @@ def getPhrase(chat_id, phrase):
     chat_id = int(chat_id)
     con = sql.connect('DataBases/DataForBot.sqlite')
     cursor = con.cursor()
-    cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase))
+    cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase.lower()))
     res = cursor.fetchone()
     if res:
         return res[3]
@@ -1408,6 +1408,6 @@ def delPhrase(chat_id, phrase):
     cursor = con.cursor()
     if getPhrase(chat_id, phrase) is None:
         return False
-    cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase))
+    cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase.lower()))
     con.commit()
     return True

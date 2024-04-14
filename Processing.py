@@ -428,8 +428,8 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
     for i in range(len(Arr[1])): #National currencies
         CurVault = float(Arr[0][i])
         CurCurrency = Arr[1][i]
-        answer += "\n" + "======" + "\n"
-        PartOfAnswer = DictOfFlagsForChat[CurCurrency] + str(f'{CurVault:,.2f}'.replace(","," ")) + DictofSymbolsForChat[CurCurrency] + " " + CurCurrency + "\n"
+        # answer += "\n" + "======" + "\n"
+        PartOfAnswer = DictOfFlagsForChat[CurCurrency] + str(f'{CurVault:,.2f}'.replace(","," ")) + DictofSymbolsForChat[CurCurrency]
         
         ListOfChatCurrencies = GetAllCurrencies(chatID)
         ListOfChatCrypto = GetAllCrypto(chatID)
@@ -440,15 +440,15 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
             elif j == 'EUR':
                 Vault = round(CurVault / GetExchangeRates.exchangeRates[CurCurrency], 2)
                 Vault = f'{Vault:,.2f}'.replace(","," ")
-                PartOfAnswer += "\n" + DictOfFlagsForChat[j] + str(Vault) + DictofSymbolsForChat[j] + " " + j
+                PartOfAnswer += " • " + DictOfFlagsForChat[j] + str(Vault) + DictofSymbolsForChat[j] + " "
             elif j != 'EUR':
                 Vault = round(CurVault * (GetExchangeRates.exchangeRates[j] / GetExchangeRates.exchangeRates[CurCurrency]), 2)
                 Vault = f'{Vault:,.2f}'.replace(","," ")
-                PartOfAnswer += "\n" + DictOfFlagsForChat[j] + str(Vault) + DictofSymbolsForChat[j] + " " + j
-        if CurCurrency == 'UAH' and CurVault == 40.0:
-            PartOfAnswer += "\n👖1 штани"
-        elif CurCurrency == 'USD' and CurVault == 300.0:
-            PartOfAnswer += "\n🤛1"
+                PartOfAnswer += " • " + DictOfFlagsForChat[j] + str(Vault) + DictofSymbolsForChat[j] + " "
+        # if CurCurrency == 'UAH' and CurVault == 40.0:
+        #     PartOfAnswer += "\n👖1 штани"
+        # elif CurCurrency == 'USD' and CurVault == 300.0:
+        #     PartOfAnswer += "\n🤛1"
 
         if len(ListOfChatCurrencies) != 0:
             PartOfAnswer += "\n"
@@ -497,8 +497,8 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
                 PartOfAnswer += "\n" + TwoZeroesToOne(str(Vault)) + " " + j
         answer += PartOfAnswer + "\n"
 
-    if True:
-        answer += "\n" + GetText(chatID, 'Crypto', chatType)
+    # if True:
+    #     answer += "\n" + GetText(chatID, 'Crypto', chatType)
 
     return answer
 

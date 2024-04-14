@@ -458,6 +458,54 @@ async def StartVoid(message: types.Message):
             await message.reply(GetText(messageData["chatID"], "main_settings_menu", messageData["chatType"]), reply_markup=CustomMarkup.SettingsMarkup(messageData['chatID'], messageData['chatType']))
 
 
+# Phrase/Answer add command
+@dp.message_handler(commands=['addpa'])
+async def AddPhrase(message: types.Message):
+    messageData = GetDataFromMessage(message)
+
+    if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
+        return
+
+    msg = message.text.replace("/addpa ", "")
+    phrase_answer = msg.split(":")
+    if len(phrase_answer) != 2 or " " in phrase_answer[0]:
+        reply_message = 'Use this command like this: /addpa kuzel:amd-gay'
+    else:
+        DBH.addPhrase(messageData["chatID"], phrase_answer[0], phrase_answer[1])
+        reply_message = f'Added phrase <b>{phrase_answer[0]}</b> and answer <b>{phrase_answer[1]}</b>'
+
+    await message.reply(reply_message, parse_mode="HTML",
+                        disable_web_page_preview=True,
+                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                               messageData[
+                                                                   'chatType']))
+
+
+# Phrase/Answer add command
+@dp.message_handler(commands=['delpa'])
+async def DeletePhrase(message: types.Message):
+    messageData = GetDataFromMessage(message)
+
+    if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
+        return
+
+    phrase = message.text.replace("/delpa ", "")
+    if " " in phrase:
+        reply_message = 'Use this command like this: /delpa kuzel'
+    else:
+        result = DBH.delPhrase(messageData["chatID"], phrase)
+        if result:
+            reply_message = f'Phrase <b>{phrase}</b> is deleted'
+        else:
+            reply_message = "Phrase is not found"
+
+    await message.reply(reply_message, parse_mode="HTML",
+                        disable_web_page_preview=True,
+                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                               messageData[
+                                                                   'chatType']))
+
+
 # Main void
 @dp.message_handler(content_types=ContentType.ANY)
 async def MainVoid(message: types.Message):
@@ -480,20 +528,11 @@ async def MainVoid(message: types.Message):
     if MessageText is None or MessageText == "":
         return
 
-    match str(MessageText).lower():
-        case 'май':
-            custom_answer = 'я пукну ты споймай'
-        case 'кужель':
-            custom_answer = 'амд-гей'
-        case 'ваза':
-            custom_answer = 'твой батя начальник унитаза'
-        case _:
-            custom_answer = None
-
-    if custom_answer:
-        reply_message = await message.reply(custom_answer, parse_mode="HTML", disable_web_page_preview=True,
-                                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                                                   messageData['chatType']))
+    if " " not in MessageText:
+        phrase_answer = DBH.getPhrase(message.from_id, MessageText)
+        await message.reply(phrase_answer, parse_mode="HTML", disable_web_page_preview=True,
+                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                   messageData['chatType']))
 
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)

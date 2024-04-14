@@ -9,7 +9,7 @@ import json
 
 from NewPrint import Print
 
-listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates", "CryptoRates", "SettingsCryptoRates", "IgnoredCurrencies"]
+listOfTables = ["SettingsGroups", "SettingsPrivateChats", "ExchangeRates", "SettingsExchangeRates", "CryptoRates", "SettingsCryptoRates", "IgnoredCurrencies", "MemePhrases"]
 listOfServiceTables = ["AdminsList", "BlackList"]
 listOfStatsTables = ["ChatsTimeStats", "ChatsUsage", "ProcessedCurrencies", "NewProcessedCurrencies"]
 
@@ -250,6 +250,35 @@ def DBIntegrityCheck():
             columns = ', '.join([f"{column_name} {column_properties['type']} DEFAULT {column_properties['default']}" for column_name, column_properties in expected_columns.items()])
             cursor.execute(f"""
                 CREATE TABLE SettingsPrivateChats (
+                    {columns}
+                );
+            """)
+
+        # check MemePhrases integrity
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='MemePhrases';")
+        table_exists = cursor.fetchone()
+        expected_columns = {
+            "id": {"type": "INTEGER", "default": "NULL PRIMARY KEY"},
+            "chatID": {"type": "INTEGER", "default": "NULL"},
+            "phrase": {"type": "TEXT", "default": "NULL"},
+            "answer": {"type": "TEXT", "default": "NULL"}
+        }
+        if table_exists:
+            # Fetch existing columns
+            cursor.execute('PRAGMA table_info(MemePhrases);')
+            existing_columns = [column[1] for column in cursor.fetchall()]
+
+            # iterate over expected columns
+            for column_name, column_properties in expected_columns.items():
+                # If the column does not exist in the table, add it
+                if column_name not in existing_columns:
+                    Print(f"Column {column_name} does not exist in SettingsGroups table. Adding it now.", "S")
+                    cursor.execute(f'''ALTER TABLE SettingsGroups ADD COLUMN {column_name} {column_properties["type"]} DEFAULT {column_properties["default"]};''')
+        else:
+            # Table does not exist, create it with all required columns
+            columns = ', '.join([f"{column_name} {column_properties['type']} DEFAULT {column_properties['default']}" for column_name, column_properties in expected_columns.items()])
+            cursor.execute(f"""
+                CREATE TABLE MemePhrases (
                     {columns}
                 );
             """)
@@ -1349,3 +1378,36 @@ def GetChatIDs():
     cursor.execute("SELECT chatID FROM SettingsPrivateChats")
     res += [k[0] for k in cursor.fetchall()]
     return res
+
+def getPhrase(chat_id, phrase):
+    chat_id = int(chat_id)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase))
+    res = cursor.fetchone()
+    if res:
+        return res[3]
+    return res
+    # cursor.execute("SELECT * from MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase,))
+    # res = cursor.fetchall()
+    # return [k[0] for k in res]
+
+def addPhrase(chat_id, phrase, answer):
+    chat_id = int(chat_id)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    if getPhrase(chat_id, phrase) is not None:
+        return False
+    cursor = con.cursor()
+    cursor.execute("INSERT INTO MemePhrases (chatID,phrase,answer) values (?,?,?)", (chat_id, phrase, answer))
+    con.commit()
+    return True
+
+def delPhrase(chat_id, phrase):
+    chat_id = int(chat_id)
+    con = sql.connect('DataBases/DataForBot.sqlite')
+    cursor = con.cursor()
+    if getPhrase(chat_id, phrase) is None:
+        return False
+    cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND phrase = ?", (chat_id, phrase))
+    con.commit()
+    return True

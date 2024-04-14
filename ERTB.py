@@ -467,15 +467,15 @@ async def AddPhrase(message: types.Message):
         return
 
     msg = message.text.replace("/addpa ", "")
-    phrase_answer = msg.split(":")
-    if len(phrase_answer) != 2 or " " in phrase_answer[0]:
+    trigger_answer = msg.split(":")
+    if len(trigger_answer) != 2 or " " in trigger_answer[0]:
         reply_message = 'Use this command like this: /addpa kuzel:amd gay'
     else:
-        result = DBH.addPhrase(messageData["chatID"], phrase_answer[0].lower(), phrase_answer[1])
+        result = DBH.addPhrase(messageData["chatID"], trigger_answer[0].lower(), trigger_answer[1])
         if result:
-            reply_message = f'Added phrase <b>{phrase_answer[0]}</b> and answer <b>{phrase_answer[1]}</b>'
+            reply_message = f'Added trigger <b>{trigger_answer[0]}</b> and answer <b>{trigger_answer[1]}</b>'
         else:
-            reply_message = f'Phrase {phrase_answer[0]} already exist or something else'
+            reply_message = f'Trigger <b>{trigger_answer[0]}</b> already exist or something else'
 
     await message.reply(reply_message, parse_mode="HTML",
                         disable_web_page_preview=True,
@@ -492,21 +492,20 @@ async def DeletePhrase(message: types.Message):
     if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
         return
 
-    phrase = message.text.replace("/delpa ", "")
-    if " " in phrase:
+    trigger_answer = message.text.replace("/delpa ", "")
+    if " " in trigger_answer:
         reply_message = 'Use this command like this: /delpa kuzel'
     else:
-        result = DBH.delPhrase(messageData["chatID"], phrase)
+        result = DBH.delPhrase(messageData["chatID"], trigger_answer)
         if result:
-            reply_message = f'Phrase <b>{phrase}</b> is deleted'
+            reply_message = f'Trigger <b>{trigger_answer}</b> is deleted'
         else:
-            reply_message = "Phrase is not found"
+            reply_message = "This trigger is not found"
 
     await message.reply(reply_message, parse_mode="HTML",
                         disable_web_page_preview=True,
                         reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                               messageData[
-                                                                   'chatType']))
+                                                               messageData['chatType']))
 
 
 # Main void
@@ -532,9 +531,9 @@ async def MainVoid(message: types.Message):
         return
 
     if " " not in MessageText:
-        phrase_answer = DBH.getPhrase(messageData["chatID"], MessageText)
-        if phrase_answer:
-            await message.reply(phrase_answer, parse_mode="HTML", disable_web_page_preview=True,
+        trigger_answer = DBH.getPhrase(messageData["chatID"], MessageText)
+        if trigger_answer:
+            await message.reply(trigger_answer, parse_mode="HTML", disable_web_page_preview=True,
                                 reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
                                                                        messageData['chatType']))
 

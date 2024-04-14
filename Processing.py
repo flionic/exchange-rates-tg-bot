@@ -463,14 +463,14 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
                 Vault = round(CurVault * (GetExchangeRates.exchangeRates['USD'] / GetExchangeRates.exchangeRates[CurCurrency] / GetExchangeRates.cryptoRates[j]), 9)
                 Vault = f'{Vault:,.9f}'.replace(","," ")
                 PartOfAnswer += " • " + TwoZeroesToOne(str(Vault)) + " " + j
-        answer += PartOfAnswer + "\n"
+        answer += PartOfAnswer + "\n\n"
 
     for i in range(len(Arr[3])): #Crypto
         isCryptoLink = True
         # answer += "\n" + "======" + "\n"
         CurVault = float(Arr[2][i])
         CurCurrency = Arr[3][i]
-        PartOfAnswer = TwoZeroesToOne(str(f'{CurVault:,.9f}'.replace(","," "))) + " " + CurCurrency
+        PartOfAnswer = "ℹ️ " + TwoZeroesToOne(str(f'{CurVault:,.9f}'.replace(","," "))) + " " + CurCurrency
 
         ListOfChatCurrencies = GetAllCurrencies(chatID)
         ListOfChatCrypto = GetAllCrypto(chatID)
@@ -479,11 +479,11 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
             if j == 'EUR':
                 Vault = round(CurVault * 1 / GetExchangeRates.exchangeRates['USD'] * GetExchangeRates.cryptoRates[CurCurrency], 2)
                 Vault = f'{Vault:,.2f}'.replace(","," ")
-                PartOfAnswer += " • " + DictOfFlagsForChat[j] + str(Vault) + " " + j
+                PartOfAnswer += " • " + DictOfFlagsForChat[j] + str(Vault) + " " + DictofSymbolsForChat[j]
             elif j != 'EUR':
                 Vault = round(CurVault * GetExchangeRates.exchangeRates[j] / GetExchangeRates.exchangeRates['USD'] * GetExchangeRates.cryptoRates[CurCurrency], 2)
                 Vault = f'{Vault:,.2f}'.replace(","," ")
-                PartOfAnswer += " • " + DictOfFlagsForChat[j] + str(Vault) + " " + j
+                PartOfAnswer += " • " + DictOfFlagsForChat[j] + str(Vault) + " " + DictofSymbolsForChat[j]
 
         if len(ListOfChatCurrencies) != 0:
             PartOfAnswer += "\n"

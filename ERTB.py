@@ -471,8 +471,11 @@ async def AddPhrase(message: types.Message):
     if len(phrase_answer) != 2 or " " in phrase_answer[0]:
         reply_message = 'Use this command like this: /addpa kuzel:amd-gay'
     else:
-        DBH.addPhrase(messageData["chatID"], phrase_answer[0], phrase_answer[1])
-        reply_message = f'Added phrase <b>{phrase_answer[0]}</b> and answer <b>{phrase_answer[1]}</b>'
+        result = DBH.addPhrase(messageData["chatID"], phrase_answer[0], phrase_answer[1])
+        if result:
+            reply_message = f'Added phrase <b>{phrase_answer[0]}</b> and answer <b>{phrase_answer[1]}</b>'
+        else:
+            reply_message = f'Phrase {phrase_answer[0]} already exist or something else'
 
     await message.reply(reply_message, parse_mode="HTML",
                         disable_web_page_preview=True,
@@ -529,7 +532,7 @@ async def MainVoid(message: types.Message):
         return
 
     if " " not in MessageText:
-        phrase_answer = DBH.getPhrase(message.from_id, MessageText)
+        phrase_answer = DBH.getPhrase(messageData["chatID"], MessageText)
         if phrase_answer:
             await message.reply(phrase_answer, parse_mode="HTML", disable_web_page_preview=True,
                                 reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],

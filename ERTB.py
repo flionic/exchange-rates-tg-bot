@@ -717,9 +717,15 @@ async def MainVoid(message: types.Message):
     endtime = time.time()
     Print("Time: " + str(endtime - starttime), "L")
     try:
-        reply_message = await message.reply(result, parse_mode="HTML", disable_web_page_preview=True,
-                                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                                                   messageData['chatType']))
+        # new message instead of reply
+        # reply_message = await message.reply(result, parse_mode="HTML", disable_web_page_preview=True,
+        #                                     reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+        #                                                                            messageData['chatType']))
+        reply_message = await bot.send_message(
+            messageData["chatID"], result,
+            parse_mode="HTML", disable_web_page_preview=True,
+            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
+        )
         DBH.UpdateChatUsage(messageData["chatID"])
         DBH.NewProcessedCurrency(messageData["chatID"], messageData["fromUserId"],
                                  message.from_user.language_code, ','.join(NumArray[1] + NumArray[3]),

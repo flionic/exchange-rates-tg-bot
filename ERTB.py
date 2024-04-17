@@ -654,9 +654,10 @@ async def MainVoid(message: types.Message):
     if " " not in MessageText:
         trigger_answer = DBH.getPhrase(messageData["chatID"], MessageText)
         if trigger_answer:
-            await message.reply(trigger_answer, parse_mode="HTML", disable_web_page_preview=True,
-                                reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                                       messageData['chatType']))
+            await trig_answ_reply(trigger_answer, message)
+
+    if "бот" in MessageText:
+        await trig_answ_reply("че ты доебался?", message)
 
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)

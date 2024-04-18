@@ -1,5 +1,7 @@
 # Token
-from Token import botToken, botUsername
+from openai import OpenAI
+
+from Token import botToken, botUsername, openai_token
 
 # Public libraries
 from aiogram import Bot, Dispatcher, executor, types
@@ -9,6 +11,7 @@ from threading import Thread
 import sys
 import time
 import os
+from random import random
 import traceback
 import logging
 import matplotlib.pyplot as plt
@@ -34,6 +37,8 @@ from w2n import ConvertWordsToNumber
 bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 IsStartedCount = False
+
+client = OpenAI(api_key=openai_token)
 
 
 def GetDataFromMessage(message: types.Message):
@@ -656,8 +661,24 @@ async def MainVoid(message: types.Message):
         if trigger_answer:
             await trig_answ_reply(trigger_answer, message)
 
-    if "бот" in MessageText:
-        await trig_answ_reply("че ты доебался?", message)
+    if with_probability(0.07):
+        chatgpt_request = f'короткий злой ответ на "{MessageText}" ответ без кавычек и предупреждений'
+        response = client.chat.completions.create(
+            model="gpt-4-turbo-2024-04-09",
+            messages=[
+                {
+                    "role": "user",
+                    "content": chatgpt_request
+                }
+            ],
+            temperature=1,
+            max_tokens=150,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+        reply_text = response.choices[0].message.content
+        await trig_answ_reply(reply_text, message)
 
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)
@@ -1107,6 +1128,10 @@ def save_error_to_file(exception_type, exception_value, exception_traceback):
 def exception_handler(exception_type, exception_value, exception_traceback):
     logging.error("An error occurred", exc_info=(exception_type, exception_value, exception_traceback))
     save_error_to_file(exception_type, exception_value, exception_traceback)
+
+
+def with_probability(probability):
+    return random() < probability
 
 
 if __name__ == '__main__':

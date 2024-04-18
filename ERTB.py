@@ -662,7 +662,7 @@ async def MainVoid(message: types.Message):
             await trig_answ_reply(trigger_answer, message)
 
     if with_probability(0.025):
-        chatgpt_request = f'короткий злой ответ на "{MessageText}" ответ без кавычек и предупреждений'
+        chatgpt_request = f'короткий злой ответ на "{MessageText}" ответ без предупреждений'
         response = client.chat.completions.create(
             # model="gpt-4-turbo-2024-04-09",
             model="gpt-3.5-turbo-0125",
@@ -678,7 +678,7 @@ async def MainVoid(message: types.Message):
             frequency_penalty=0,
             presence_penalty=0
         )
-        reply_text = response.choices[0].message.content
+        reply_text = response.choices[0].message.content.replace('"', "")
         await trig_answ_reply(reply_text, message)
 
     # Logging basic information to terminal

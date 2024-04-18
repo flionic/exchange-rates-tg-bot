@@ -664,7 +664,8 @@ async def MainVoid(message: types.Message):
     if with_probability(0.07):
         chatgpt_request = f'короткий злой ответ на "{MessageText}" ответ без кавычек и предупреждений'
         response = client.chat.completions.create(
-            model="gpt-4-turbo-2024-04-09",
+            # model="gpt-4-turbo-2024-04-09",
+            model="gpt-3.5-turbo-0125",
             messages=[
                 {
                     "role": "user",
@@ -1131,7 +1132,9 @@ def exception_handler(exception_type, exception_value, exception_traceback):
 
 
 def with_probability(probability):
-    return random() < probability
+    r = random()
+    print(r)
+    return r < probability
 
 
 if __name__ == '__main__':

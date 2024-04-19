@@ -429,7 +429,7 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
         CurVault = float(Arr[0][i])
         CurCurrency = Arr[1][i]
         # answer += "\n" + "======" + "\n"
-        PartOfAnswer = "ℹ️ " + DictOfFlagsForChat[CurCurrency] + str(f'{CurVault:,.2f}'.replace(","," ")) + DictofSymbolsForChat[CurCurrency]
+        PartOfAnswer = "" + DictOfFlagsForChat[CurCurrency] + str(f'{CurVault:,.2f}'.replace(","," ")) + DictofSymbolsForChat[CurCurrency]
         
         ListOfChatCurrencies = GetAllCurrencies(chatID)
         ListOfChatCrypto = GetAllCrypto(chatID)

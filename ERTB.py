@@ -661,7 +661,7 @@ async def MainVoid(message: types.Message):
         if trigger_answer:
             await trig_answ_reply(trigger_answer, message)
 
-    if with_probability(0.025):
+    if with_probability(0.01):
         chatgpt_request = f'короткий злой ответ на "{MessageText}"'
         response = client.chat.completions.create(
             # model="gpt-4-turbo-2024-04-09",

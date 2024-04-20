@@ -1174,7 +1174,7 @@ def gpt_alexa():
             },
             {
               "role": "assistant",
-              "content": "умер от кринжа, словил снаряд"
+              "content": "1. Умер от кринжа. \n 2. Словил снаряд"
             },
             {
               "role": "user",

@@ -1164,7 +1164,7 @@ def gpt_alexa():
             # },
             {
               "role": "user",
-              "content": "смешные способы самоубийста (могут повторяться)"
+              "content": "смешные способы самоубийста"
             },
             {
               "role": "assistant",
@@ -1175,7 +1175,7 @@ def gpt_alexa():
               "content": "дай еще"
             },
         ],
-        temperature=0.4,
+        temperature=0.15,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,

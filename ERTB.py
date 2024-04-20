@@ -1150,17 +1150,29 @@ def gpt_alexa():
         # model="gpt-4-turbo-2024-04-09",
         model="gpt-3.5-turbo-0125",
         messages=[
+            # {
+            #     "role": "user",
+            #     "content": "способы самоубийства (могут повторяться)"
+            # },
+            # {
+            #     "role": "assistant",
+            #     "content": "Повесился, застрелился"
+            # },
+            # {
+            #     "role": "user",
+            #     "content": "дай еще"
+            # },
             {
-                "role": "user",
-                "content": "способы самоубийства (могут повторяться)"
+              "role": "user",
+              "content": "смешные способы самоубийста (могут повторяться)"
             },
             {
-                "role": "assistant",
-                "content": "Повесился, застрелился"
+              "role": "assistant",
+              "content": "умер от кринжа, словил снаряд"
             },
             {
-                "role": "user",
-                "content": "дай еще"
+              "role": "user",
+              "content": "дай еще"
             },
         ],
         temperature=1,

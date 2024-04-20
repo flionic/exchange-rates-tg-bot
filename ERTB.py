@@ -1178,7 +1178,7 @@ def gpt_alexa():
             },
             {
               "role": "user",
-              "content": "дай еще"
+              "content": "дай новое"
             },
         ],
         temperature=0.55,

@@ -663,6 +663,7 @@ async def MainVoid(message: types.Message):
 
     if MessageText.lower() == "малой":
         reply_text = gpt_request("короткий ответ как можно самоубиться, помощь не предлагай")
+        await trig_answ_reply(reply_text, message)
 
 
     if with_probability(0.01):

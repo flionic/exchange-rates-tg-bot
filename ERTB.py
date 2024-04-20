@@ -664,9 +664,8 @@ async def MainVoid(message: types.Message):
     if MessageText.lower() == "малой":
         await trig_answ_reply(gpt_alexa(), message)
 
-
     if with_probability(0.01):
-        reply_text = gpt_request(f'короткий злой ответ на "{MessageText}"')
+        reply_text = gpt_request(MessageText)
         await trig_answ_reply(reply_text, message)
 
     # Logging basic information to terminal
@@ -1124,15 +1123,22 @@ def with_probability(probability):
     return r < probability
 
 
-def gpt_request(prompt):
-    chatgpt_request = prompt
+def gpt_request(text):
     response = client.chat.completions.create(
         # model="gpt-4-turbo-2024-04-09",
         model="gpt-3.5-turbo-0125",
         messages=[
             {
                 "role": "user",
-                "content": chatgpt_request
+                "content": "ты даешь короткие злые но смешные ответы"
+            },
+            {
+                "role": "assistant",
+                "content": "хорошо"
+            },
+            {
+                "role": "user",
+                "content": text
             }
         ],
         temperature=1,
@@ -1141,7 +1147,7 @@ def gpt_request(prompt):
         frequency_penalty=0,
         presence_penalty=0
     )
-    reply_text = response.choices[0].message.content.replace('"', "")
+    reply_text = response.choices[0].message.content
     return reply_text
 
 
@@ -1181,7 +1187,7 @@ def gpt_alexa():
         frequency_penalty=0,
         presence_penalty=0
     )
-    reply_text = response.choices[0].message.content.replace('"', "")
+    reply_text = response.choices[0].message.content
     return reply_text
 
 

@@ -1161,7 +1161,7 @@ def gpt_request(text):
         messages=[
             {
                 "role": "user",
-                "content": text
+                "content": f"{text} - ответ давай короткий и по делу, с долей иронии"
             },
         ],
         temperature=1,

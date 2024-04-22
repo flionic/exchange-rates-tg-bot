@@ -661,8 +661,11 @@ async def MainVoid(message: types.Message):
         if trigger_answer:
             await trig_answ_reply(trigger_answer, message)
 
-    if MessageText.startswith("жпт ") and DBH.IsAdmin(messageData["fromUserId"]):
+    if MessageText.lower().startswith("жпт ") and DBH.IsAdmin(messageData["fromUserId"]):
         await trig_answ_reply(gpt_request(MessageText.replace("жпт ", "")), message)
+
+    if MessageText.lower().startswith("жпт4 ") and DBH.IsAdmin(messageData["fromUserId"]):
+        await trig_answ_reply(gpt4_request(MessageText.replace("жпт ", "")), message)
 
     if MessageText.lower() == "малой":
         await trig_answ_reply(gpt_alexa(), message)
@@ -1162,6 +1165,26 @@ def gpt_request(text):
             {
                 "role": "user",
                 "content": f"{text} - ответ давай короткий и по делу, с долей иронии"
+            },
+        ],
+        temperature=1,
+        max_tokens=150,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    reply_text = response.choices[0].message.content
+    return reply_text
+
+
+def gpt4_request(text):
+    response = client.chat.completions.create(
+        # model="gpt-4-turbo-2024-04-09",
+        model="gpt-3.5-turbo-0125",
+        messages=[
+            {
+                "role": "user",
+                "content": f"{text} - ответ давай короткий и по делу"
             },
         ],
         temperature=1,

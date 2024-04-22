@@ -202,7 +202,8 @@ def DBIntegrityCheck():
             "editSettings": {"type": "TEXT", "default": "'admins'"},
             "flags": {"type": "INTEGER", "default": "1"},
             "currencySymbol": {"type": "INTEGER", "default": "1"},
-            "lang": {"type": "TEXT", "default": "'en'"}
+            "lang": {"type": "TEXT", "default": "'en'"},
+            "is_gpt_enabled": {"type": "INTEGER", "default": "0"},
         }
         if table_exists:
             # Fetch existing columns
@@ -610,7 +611,8 @@ def CreateDataBaseTemplate():
                 editSettings TEXT DEFAULT admins,
                 flags INTEGER DEFAULT 1,
                 currencySymbol INTEGER DEFAULT 1,
-                lang TEXT DEFAULT en
+                lang TEXT DEFAULT en,
+                is_gpt_enabled INTEGER DEFAULT 0,
             );
         """)
     with con:
@@ -637,6 +639,16 @@ def CreateDataBaseTemplate():
                 currency TEXT NOT NULL PRIMARY KEY,
                 flag TEXT,
                 exchangeRates FLOAT
+            );
+        """)
+    with con:
+        con.execute("""
+            CREATE TABLE MemePhrases (
+                id INTEGER NOT NULL PRIMARY KEY ,
+                chatID INTEGER NOT NULL ,
+                trigger TEXT DEFAULT NULL,
+                answer TEXT DEFAULT NULL,
+                authorID INTEGER NOT NULL,
             );
         """)
 

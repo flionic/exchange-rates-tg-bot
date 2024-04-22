@@ -633,6 +633,30 @@ async def trig_is_admin(message):
     return False
 
 
+@dp.message_handler(commands=['allow_gpt'])
+async def enable_gpt(message: types.Message):
+    message_data = GetDataFromMessage(message)
+    group_type = message.chat.type
+    if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
+        DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 1, group_type)
+        return await trig_answ_reply(
+            "GPT Allowed for this chat, usage: \n\n\"жпт сколько весит мама Тараса\"",
+            message
+        )
+
+
+@dp.message_handler(commands=['deny_gpt'])
+async def disable_gpt(message: types.Message):
+    message_data = GetDataFromMessage(message)
+    group_type = message.chat.type
+    if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
+        DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 1, group_type)
+        return await trig_answ_reply(
+            "GPT Denied for this chat",
+            message
+        )
+
+
 # Main void
 @dp.message_handler(content_types=ContentType.ANY)
 async def MainVoid(message: types.Message):
@@ -661,10 +685,11 @@ async def MainVoid(message: types.Message):
         if trigger_answer:
             await trig_answ_reply(trigger_answer, message)
 
-    if MessageText.lower().startswith("жпт ") and DBH.IsAdmin(messageData["fromUserId"]):
+    # GPT commands
+    if MessageText.lower().startswith("жпт ") and is_gpt_allowed(message):
         await trig_answ_reply(gpt_request(MessageText.replace("жпт ", "")), message)
 
-    if MessageText.lower().startswith("жпт4 ") and DBH.IsAdmin(messageData["fromUserId"]):
+    if MessageText.lower().startswith("жпт4 ") and is_gpt_allowed(message):
         await trig_answ_reply(gpt4_request(MessageText.replace("жпт4 ", "")), message)
 
     if MessageText.lower() == "малой":
@@ -1127,6 +1152,18 @@ def exception_handler(exception_type, exception_value, exception_traceback):
 def with_probability(probability):
     r = random()
     return r < probability
+
+
+def is_gpt_allowed(message):
+    message_data = GetDataFromMessage(message)
+
+    if DBH.GetSetting(message_data["chatID"], "is_gpt_enabled", message.chat.type):
+        return True
+
+    if DBH.IsAdmin(message_data["fromUserId"]):
+        return True
+
+    return False
 
 
 def gpt_meme(text):

@@ -1179,8 +1179,7 @@ def gpt_request(text):
 
 def gpt4_request(text):
     response = client.chat.completions.create(
-        # model="gpt-4-turbo-2024-04-09",
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4-turbo-2024-04-09",
         messages=[
             {
                 "role": "user",

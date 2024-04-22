@@ -665,7 +665,7 @@ async def MainVoid(message: types.Message):
         await trig_answ_reply(gpt_request(MessageText.replace("жпт ", "")), message)
 
     if MessageText.lower().startswith("жпт4 ") and DBH.IsAdmin(messageData["fromUserId"]):
-        await trig_answ_reply(gpt4_request(MessageText.replace("жпт ", "")), message)
+        await trig_answ_reply(gpt4_request(MessageText.replace("жпт4 ", "")), message)
 
     if MessageText.lower() == "малой":
         await trig_answ_reply(gpt_alexa(), message)

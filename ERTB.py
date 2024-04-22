@@ -634,7 +634,7 @@ async def trig_is_admin(message):
 
 
 @dp.message_handler(commands=['allow_gpt'])
-async def enable_gpt(message: types.Message):
+async def gpt_enable(message: types.Message):
     message_data = GetDataFromMessage(message)
     group_type = message.chat.type
     if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
@@ -646,11 +646,11 @@ async def enable_gpt(message: types.Message):
 
 
 @dp.message_handler(commands=['deny_gpt'])
-async def disable_gpt(message: types.Message):
+async def gpt_disable(message: types.Message):
     message_data = GetDataFromMessage(message)
     group_type = message.chat.type
     if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
-        DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 1, group_type)
+        DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 0, group_type)
         return await trig_answ_reply(
             "GPT Denied for this chat",
             message

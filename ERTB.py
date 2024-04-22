@@ -598,22 +598,22 @@ async def DeletePhrase(message: types.Message):
     is_phrase_author = DBH.isPhraseAuthor(messageData["chatID"], trigger, messageData["fromUserId"])
     print(is_phrase_author)
     if is_phrase_author is None:
-        return await trig_answ_reply("This trigger is not found", message)
+        return await short_reply("This trigger is not found", message)
 
     is_admin = await trig_is_admin(message)
     print(is_admin)
     if is_admin is False and is_phrase_author is False:
-        return await trig_answ_reply("You don't have permissions to do this", message)
+        return await short_reply("You don't have permissions to do this", message)
 
     if " " in trigger:
-        return await trig_answ_reply('Use this command like this: /delpa kuzel', message)
+        return await short_reply('Use this command like this: /delpa kuzel', message)
 
     result = DBH.delPhrase(messageData["chatID"], trigger)
     if result:
-        return await trig_answ_reply(f'Trigger <b>{trigger}</b> is deleted', message)
+        return await short_reply(f'Trigger <b>{trigger}</b> is deleted', message)
 
 
-async def trig_answ_reply(text, message):
+async def short_reply(text, message):
     message_data = GetDataFromMessage(message)
     await message.reply(
         text,
@@ -639,7 +639,7 @@ async def gpt_enable(message: types.Message):
     group_type = message.chat.type
     if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
         DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 1, group_type)
-        return await trig_answ_reply(
+        return await short_reply(
             "GPT Allowed for this chat, usage: \n\n\"жпт сколько весит мама Тараса\"",
             message
         )
@@ -651,7 +651,7 @@ async def gpt_disable(message: types.Message):
     group_type = message.chat.type
     if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
         DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 0, group_type)
-        return await trig_answ_reply(
+        return await short_reply(
             "GPT Denied for this chat",
             message
         )
@@ -683,21 +683,21 @@ async def MainVoid(message: types.Message):
     if " " not in MessageText:
         trigger_answer = DBH.getPhrase(messageData["chatID"], MessageText)
         if trigger_answer:
-            await trig_answ_reply(trigger_answer, message)
+            await short_reply(trigger_answer, message)
 
     # GPT commands
     if MessageText.lower().startswith("жпт ") and is_gpt_allowed(message):
-        await trig_answ_reply(gpt_request(MessageText.replace("жпт ", "")), message)
+        await short_reply(gpt_request(MessageText.replace("жпт ", "")), message)
 
     if MessageText.lower().startswith("жпт4 ") and is_gpt_allowed(message):
-        await trig_answ_reply(gpt4_request(MessageText.replace("жпт4 ", "")), message)
+        await short_reply(gpt4_request(MessageText.replace("жпт4 ", "")), message)
 
     if MessageText.lower() == "малой":
-        await trig_answ_reply(gpt_alexa(), message)
+        await short_reply(gpt_alexa(), message)
 
     if with_probability(0.01):
         reply_text = gpt_meme(MessageText)
-        await trig_answ_reply(reply_text, message)
+        await short_reply(reply_text, message)
 
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)

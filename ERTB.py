@@ -685,12 +685,20 @@ async def MainVoid(message: types.Message):
         if trigger_answer:
             await short_reply(trigger_answer, message)
 
+    if "тест" in MessageText:
+        temp_message = message
+        print(message.reply_to_message.text)
+        print(message.reply_to_message.message_id)
+
+        await bot.get_chat_history
+        # await short_reply('+', message)
+
     # GPT commands
     if MessageText.lower().startswith("жпт ") and is_gpt_allowed(message):
-        await short_reply(gpt_request(MessageText.replace("жпт ", "")), message)
+        await short_reply(gpt_request(MessageText[4:]), message)
 
     if MessageText.lower().startswith("жпт4 ") and is_gpt_allowed(message):
-        await short_reply(gpt4_request(MessageText.replace("жпт4 ", "")), message)
+        await short_reply(gpt4_request(MessageText[5:]), message)
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)

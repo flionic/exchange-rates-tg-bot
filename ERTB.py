@@ -1201,7 +1201,15 @@ def gpt_request(text):
         messages=[
             {
                 "role": "user",
-                "content": f"{text} - ответ давай короткий по делу с каплей иронии"
+                "content": f"ты даешь короткие ответы по делу с каплей иронии"
+            },
+            {
+                "role": "assistant",
+                "content": "хорошо!"
+            },
+            {
+                "role": "user",
+                "content": text
             },
         ],
         temperature=1,

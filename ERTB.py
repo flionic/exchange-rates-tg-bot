@@ -688,13 +688,13 @@ async def MainVoid(message: types.Message):
             await short_reply(trigger_answer, message)
 
     # GPT commands
-    gpt_request_text = re.split('^[ж|Ж]пт[ | ]', MessageText)
-    if len(gpt_request_text) > 1 and is_gpt_allowed(message):
-        await short_reply(gpt_request(gpt_request_text[1]), message)
+    gpt_request_text = re.subn('^[ж|Ж]пт[ | ]', '', MessageText)
+    if gpt_request_text[1] and is_gpt_allowed(message):
+        await short_reply(gpt_request(gpt_request_text[0]), message)
 
-    gpt4_request_text = re.split('^[ж|Ж]пт4[ | ]', MessageText)
-    if len(gpt4_request_text) > 1 and is_gpt_allowed(message):
-        await short_reply(gpt4_request(gpt4_request_text[1]), message)
+    gpt4_request_text = re.subn('^[ж|Ж]пт4[ | ]', '', MessageText)
+    if gpt4_request_text[1] and is_gpt_allowed(message):
+        await short_reply(gpt4_request(gpt4_request_text[0]), message)
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
@@ -1172,23 +1172,19 @@ def is_gpt_allowed(message):
 
 def gpt_meme(text):
     response = client.chat.completions.create(
-        # model="gpt-4-turbo-2024-04-09",
         model="gpt-3.5-turbo-0125",
         messages=[
             {
-                "role": "user",
-                "content": "ты даешь короткие злые но смешные ответы"
-            },
-            {
-                "role": "assistant",
-                "content": "хорошо"
+                "role": "system",
+                # "content": "ты даешь короткие ответы в виде ироничных шуток",
+                "content": "ты даешь короткие злые и смешные ответы"
             },
             {
                 "role": "user",
                 "content": text
             }
         ],
-        temperature=1,
+        temperature=1.15,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,
@@ -1200,16 +1196,11 @@ def gpt_meme(text):
 
 def gpt_request(text):
     response = client.chat.completions.create(
-        # model="gpt-4-turbo-2024-04-09",
         model="gpt-3.5-turbo-0125",
         messages=[
             {
-                "role": "user",
+                "role": "system",
                 "content": f"ты даешь короткие ответы по делу с каплей иронии"
-            },
-            {
-                "role": "assistant",
-                "content": "хорошо"
             },
             {
                 "role": "user",
@@ -1231,8 +1222,12 @@ def gpt4_request(text):
         model="gpt-4-turbo-2024-04-09",
         messages=[
             {
+                "role": "system",
+                "content": f"ты даешь короткие ответы"
+            },
+            {
                 "role": "user",
-                "content": f"{text} - ответ давай короткий"
+                "content": text
             },
         ],
         temperature=1,

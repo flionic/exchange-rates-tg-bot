@@ -763,6 +763,7 @@ async def MainVoid(message: types.Message):
     endtime = time.time()
     Print("Time: " + str(endtime - starttime), "L")
 
+    # parcel tax calculator
     gpt4_parcel_text = re.subn('^[П|п]осылка[ | ]', '', MessageText)
     if gpt4_parcel_text[1] and is_gpt_allowed(message):
         parcel_value = NumArray[0][0]
@@ -1268,9 +1269,9 @@ X - стоимость посылки в евро
 Пошлина = (X – 150.00) * 10% = Z1
 НДС = (Y + Z1) * 20% = Z2
 
-Сумма растаможки = Z1+Z2 (пошлина + НДС)
+Растаможка = Z1+Z2 (пошлина + НДС)
 
-Расчеты растаможки делай вдумчиво, принимаешь цену посылки, ответ короткий"""
+Считай вдумчиво, ответ короткий начиная с базы"""
             },
             {
                 "role": "user",

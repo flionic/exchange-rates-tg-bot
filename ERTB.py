@@ -745,6 +745,65 @@ async def MainVoid(message: types.Message):
         return
     Print("After SearchValuesAndCurrencies(): " + str(NumArray), "L")
 
+    # parcel tax calculator
+    parcel_tax_request = re.subn('^[П|п]осылка[ | ]', '', MessageText)
+    if parcel_tax_request[1]:
+        tax_limit = 150
+        if NumArray == [[], [], [], []]:
+            await short_reply(
+                "Пожалуйста, уточните конкретную стоимость посылки, чтобы я мог рассчитать растаможку.",
+                message
+            )
+            return
+
+        print(2)
+        parcel_value, parcel_currency = NumArray[0][0], NumArray[1][0]
+        parcel_eur_value, parcel_uah_value = parcel_value, parcel_value
+
+        if parcel_currency != "EUR":
+            parcel_eur_value = round(
+                parcel_value *
+                GetExchangeRates.exchangeRates["EUR"] / GetExchangeRates.exchangeRates[parcel_currency], 2
+            )
+
+        if parcel_currency != "UAH":
+            parcel_uah_value = round(
+                parcel_value *
+                GetExchangeRates.exchangeRates["UAH"] / GetExchangeRates.exchangeRates[parcel_currency], 2
+            )
+
+        if parcel_eur_value < 150:
+            await short_reply(
+                f"На посылку стоимостью {parcel_eur_value}€ растаможенная пошлина не начисляется, "
+                f"так как цена ниже безналогового лимита в {tax_limit}€.",
+                message
+            )
+            return
+
+        parcel_tax_base = parcel_eur_value - tax_limit
+        parcel_tax_duty = parcel_tax_base * 0.1
+        parcel_tax_vat = (parcel_tax_base + parcel_tax_duty) * 0.2
+        parcel_tax_customs_clearance = parcel_tax_duty + parcel_tax_vat
+        parcel_tax_clearance_uah = round(
+            parcel_tax_customs_clearance *
+            GetExchangeRates.exchangeRates["UAH"] / GetExchangeRates.exchangeRates["EUR"], 2
+        )
+        parcel_total_uah = parcel_uah_value + parcel_tax_clearance_uah
+
+        reply_text = f"""Расчет растаможки посылки стоимостью {parcel_value} {parcel_currency}
+
+База налога: {parcel_eur_value}€ - {tax_limit}€ = {parcel_tax_base}€
+Пошлина: {parcel_tax_base}€ * 10% = {parcel_tax_duty}€
+НДС: ({parcel_tax_base}€ + {parcel_tax_duty}€) * 20% = {parcel_tax_vat}€
+Сумма = {parcel_tax_duty}€ + {parcel_tax_vat}€ = <b>{parcel_tax_customs_clearance}€</b>
+
+Итого:
+Растаможка = <b>{parcel_tax_clearance_uah} грн.</b>
+Полная стоимость посылки: <b>{parcel_total_uah} грн.</b>
+            """
+        await short_reply(reply_text, message)
+        return
+
     # If there are no currencies, then work is interrupted
     if NumArray == [[], [], [], []]:
         return
@@ -762,20 +821,6 @@ async def MainVoid(message: types.Message):
     result = AnswerText(NumArray, messageData["chatID"], messageData["chatType"])
     endtime = time.time()
     Print("Time: " + str(endtime - starttime), "L")
-
-    # parcel tax calculator
-    gpt4_parcel_text = re.subn('^[П|п]осылка[ | ]', '', MessageText)
-    if gpt4_parcel_text[1] and is_gpt_allowed(message):
-        parcel_value = NumArray[0][0]
-        parcel_currency = NumArray[1][0]
-        if parcel_currency != "EUR":
-            parcel_eur_currency = round(
-                parcel_value * GetExchangeRates.exchangeRates["EUR"] / GetExchangeRates.exchangeRates[parcel_currency],
-                2)
-            await short_reply(gpt4_parcel(f"посылка {parcel_eur_currency} евро"), message)
-        else:
-            await short_reply(gpt4_parcel(gpt4_parcel_text[0]), message)
-        return
 
     try:
         # new message instead of reply

@@ -3,6 +3,7 @@ import re
 
 from openai import OpenAI
 
+import GetExchangeRates
 from Token import botToken, botUsername, openai_token
 
 # Public libraries
@@ -696,10 +697,6 @@ async def MainVoid(message: types.Message):
     if gpt4_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt4_request(gpt4_request_text[0]), message)
 
-    gpt4_parcel_text = re.subn('^[П|п]осылка[ | ]', '', MessageText)
-    if gpt4_parcel_text[1] and is_gpt_allowed(message):
-        await short_reply(gpt4_parcel(gpt4_parcel_text[0]), message)
-
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
 
@@ -765,6 +762,20 @@ async def MainVoid(message: types.Message):
     result = AnswerText(NumArray, messageData["chatID"], messageData["chatType"])
     endtime = time.time()
     Print("Time: " + str(endtime - starttime), "L")
+
+    gpt4_parcel_text = re.subn('^[П|п]осылка[ | ]', '', MessageText)
+    if gpt4_parcel_text[1] and is_gpt_allowed(message):
+        parcel_value = NumArray[0][0]
+        parcel_currency = NumArray[1][0]
+        if parcel_currency != "EUR":
+            parcel_eur_currency = round(
+                parcel_value * GetExchangeRates.exchangeRates["EUR"] / GetExchangeRates.exchangeRates[parcel_currency],
+                2)
+            await short_reply(gpt4_parcel(f"посылка {parcel_eur_currency} евро"), message)
+        else:
+            await short_reply(gpt4_parcel(gpt4_parcel_text[0]), message)
+        return
+
     try:
         # new message instead of reply
         # reply_message = await message.reply(result, parse_mode="HTML", disable_web_page_preview=True,
@@ -1294,16 +1305,16 @@ def gpt_alexa():
             #     "content": "дай еще"
             # },
             {
-              "role": "user",
-              "content": "смешные способы самоубийста (ответ в прошлом)"
+                "role": "user",
+                "content": "смешные способы самоубийста (ответ в прошлом)"
             },
             {
-              "role": "assistant",
-              "content": "1. Умер от кринжа. \n 2. Словил снаряд"
+                "role": "assistant",
+                "content": "1. Умер от кринжа. \n 2. Словил снаряд"
             },
             {
-              "role": "user",
-              "content": "дай еще, отсчет с 1"
+                "role": "user",
+                "content": "дай еще, отсчет с 1"
             },
         ],
         temperature=0.55,

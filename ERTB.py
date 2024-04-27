@@ -745,10 +745,11 @@ async def MainVoid(message: types.Message):
         return
     Print("After SearchValuesAndCurrencies(): " + str(NumArray), "L")
 
-    # parcel tax calculator
+    # PARCEL TAX CALCULATOR
     parcel_tax_request = re.subn('^[П|п]осылка[ | ]', '', MessageText)
     if parcel_tax_request[1]:
         tax_limit = 150
+        is_npshopping = True if "нпш" in MessageText else False
         if NumArray == [[], [], [], []]:
             await short_reply(
                 "Пожалуйста, уточните конкретную стоимость посылки, чтобы я мог рассчитать растаможку.",
@@ -756,7 +757,6 @@ async def MainVoid(message: types.Message):
             )
             return
 
-        print(2)
         parcel_value, parcel_currency = NumArray[0][0], NumArray[1][0]
         parcel_eur_value, parcel_uah_value = parcel_value, parcel_value
 
@@ -781,28 +781,42 @@ async def MainVoid(message: types.Message):
             return
 
         parcel_tax_base = parcel_eur_value - tax_limit
-        parcel_tax_duty = parcel_tax_base * 0.1
-        parcel_tax_vat = (parcel_tax_base + parcel_tax_duty) * 0.2
-        parcel_tax_customs_clearance = parcel_tax_duty + parcel_tax_vat
+        parcel_tax_duty = round(parcel_tax_base * 0.1, 2)
+        parcel_tax_vat = round((parcel_tax_base + parcel_tax_duty) * 0.2, 2)
+        parcel_tax_npshopping = round(parcel_tax_base * 0.03, 2)
+        parcel_tax_customs_clearance = round(parcel_tax_duty + parcel_tax_vat
+                                             + (parcel_tax_npshopping if is_npshopping else 0), 2)
         parcel_tax_clearance_uah = round(
             parcel_tax_customs_clearance *
             GetExchangeRates.exchangeRates["UAH"] / GetExchangeRates.exchangeRates["EUR"], 2
         )
-        parcel_total_uah = parcel_uah_value + parcel_tax_clearance_uah
+        parcel_total_uah = round(parcel_uah_value + parcel_tax_clearance_uah, 2)
 
+        # todo: convert it to HTML template
         reply_text = f"""Расчет растаможки посылки стоимостью {parcel_value} {parcel_currency}
 
 База налога: {parcel_eur_value}€ - {tax_limit}€ = {parcel_tax_base}€
 Пошлина: {parcel_tax_base}€ * 10% = {parcel_tax_duty}€
 НДС: ({parcel_tax_base}€ + {parcel_tax_duty}€) * 20% = {parcel_tax_vat}€
-Сумма = {parcel_tax_duty}€ + {parcel_tax_vat}€ = <b>{parcel_tax_customs_clearance}€</b>
+"""
+        if is_npshopping:
+            reply_text += f"""Брокер НПШ: {parcel_tax_base}€ * 3% = {parcel_tax_npshopping}€
+Сумма = {parcel_tax_duty}€ + {parcel_tax_vat}€ + {parcel_tax_npshopping}€ = <b>{parcel_tax_customs_clearance}€</b>
+"""
+        else:
+            reply_text += f"Сумма = {parcel_tax_duty}€ + {parcel_tax_vat}€ = <b>{parcel_tax_customs_clearance}€</b>"
 
-Итого:
+        reply_text += f"""
+
+<i>Итого:</i>
+Посылка = <b>{parcel_uah_value} грн.</b>
 Растаможка = <b>{parcel_tax_clearance_uah} грн.</b>
-Полная стоимость посылки: <b>{parcel_total_uah} грн.</b>
-            """
+Стоимость посылки с растаможкой: <b>{parcel_total_uah} грн.</b>
+"""
+
         await short_reply(reply_text, message)
         return
+    # END OF PARCEL TAX
 
     # If there are no currencies, then work is interrupted
     if NumArray == [[], [], [], []]:

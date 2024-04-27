@@ -688,13 +688,17 @@ async def MainVoid(message: types.Message):
             await short_reply(trigger_answer, message)
 
     # GPT commands
-    gpt_request_text = re.subn('^[ж|Ж]пт[ | ]', '', MessageText)
+    gpt_request_text = re.subn('^[Ж|ж]пт[ | ]', '', MessageText)
     if gpt_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt_request(gpt_request_text[0]), message)
 
-    gpt4_request_text = re.subn('^[ж|Ж]пт4[ | ]', '', MessageText)
+    gpt4_request_text = re.subn('^[Ж|ж]пт4[ | ]', '', MessageText)
     if gpt4_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt4_request(gpt4_request_text[0]), message)
+
+    gpt4_parcel_text = re.subn('^[П|п]осылка[ | ]', '', MessageText)
+    if gpt4_parcel_text[1] and is_gpt_allowed(message):
+        await short_reply(gpt4_parcel(gpt4_parcel_text[0]), message)
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
@@ -1224,6 +1228,38 @@ def gpt4_request(text):
             {
                 "role": "system",
                 "content": f"ты даешь короткие ответы"
+            },
+            {
+                "role": "user",
+                "content": text
+            },
+        ],
+        temperature=1,
+        max_tokens=150,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    reply_text = response.choices[0].message.content
+    return reply_text
+
+
+def gpt4_parcel(text):
+    response = client.chat.completions.create(
+        model="gpt-4-turbo-2024-04-09",
+        messages=[
+            {
+                "role": "system",
+                "content": f"""Формула расчета растаможки посылки:
+
+X - стоимость посылки в евро
+База налога: X – 150.00 = Y
+Пошлина = (X – 150.00) * 10% = Z1
+НДС = (Y + Z1) * 20% = Z2
+
+Сумма растаможки = Z1+Z2 (пошлина + НДС)
+
+Расчеты растаможки делай вдумчиво, принимаешь цену посылки, ответ короткий"""
             },
             {
                 "role": "user",

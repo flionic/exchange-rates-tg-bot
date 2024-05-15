@@ -8,7 +8,7 @@ from Token import botToken, botUsername, openai_token
 
 # Public libraries
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types.message import ContentType
+from aiogram.types.message import ContentType, ParseMode
 from aiogram.types.inline_keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from threading import Thread
 import sys
@@ -620,7 +620,7 @@ async def short_reply(text, message):
     message_data = GetDataFromMessage(message)
     await message.reply(
         text,
-        parse_mode="MARKDOWN_V2",
+        parse_mode=ParseMode.MARKDOWN_V2,
         disable_web_page_preview=True,
         reply_markup=CustomMarkup.DeleteMarkup(message_data['chatID'], message_data['chatType'])
     )

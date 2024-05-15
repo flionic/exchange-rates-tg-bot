@@ -691,11 +691,19 @@ async def MainVoid(message: types.Message):
     # GPT commands
     gpt_request_text = re.subn('^[Ж|ж]пт[ | ]', '', MessageText)
     if gpt_request_text[1] and is_gpt_allowed(message):
-        await short_reply(gpt_request(gpt_request_text[0]), message)
+        await short_reply(gpt4o_request(gpt_request_text[0]), message)
 
-    gpt4_request_text = re.subn('^[Ж|ж]пт4[ | ]', '', MessageText)
+    gpt4_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
     if gpt4_request_text[1] and is_gpt_allowed(message):
-        await short_reply(gpt4_request(gpt4_request_text[0]), message)
+        await short_reply(gpt35_request(gpt4_request_text[0]), message)
+
+    # soon deprecated
+    gpt4_old_request_text = re.subn('^[Ж|ж]пт4[ | ]', '', MessageText)
+    if gpt4_old_request_text[1] and is_gpt_allowed(message):
+        await short_reply(
+            gpt35_request(gpt4_old_request_text[0]),
+            "Эта команда устарела. Используй просто \"жпт\", если требуется GPT-4o модель.\n\n" + message
+        )
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
@@ -1271,7 +1279,7 @@ def gpt_meme(text):
     return reply_text
 
 
-def gpt_request(text):
+def gpt35_request(text):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
         messages=[
@@ -1294,7 +1302,7 @@ def gpt_request(text):
     return reply_text
 
 
-def gpt4_request(text):
+def gpt4o_request(text):
     response = client.chat.completions.create(
         model="gpt-4o",
         # model="gpt-4-turbo-2024-04-09",

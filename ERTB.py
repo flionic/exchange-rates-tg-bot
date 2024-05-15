@@ -620,7 +620,7 @@ async def short_reply(text, message):
     message_data = GetDataFromMessage(message)
     await message.reply(
         text,
-        parse_mode="HTML",
+        parse_mode="MarkdownV2",
         disable_web_page_preview=True,
         reply_markup=CustomMarkup.DeleteMarkup(message_data['chatID'], message_data['chatType'])
     )

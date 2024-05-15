@@ -693,6 +693,10 @@ async def MainVoid(message: types.Message):
     if gpt_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt4o_request(gpt_request_text[0]), message)
 
+    gpts_request_text = re.subn('^[Ж|ж]птс[ | ]', '', MessageText)
+    if gpts_request_text[1] and is_gpt_allowed(message):
+        await short_reply(gpt4o_s_request(gpts_request_text[0]), message)
+
     gpt35_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
     if gpt35_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt35_request(gpt35_request_text[0]), message)
@@ -1315,6 +1319,29 @@ def gpt4o_request(text):
             },
         ],
         temperature=1,
+        max_tokens=150,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    reply_text = response.choices[0].message.content
+    return reply_text
+
+
+def gpt4o_s_request(text):
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "system",
+                "content": f"ты даешь короткие ответы с максимальным уровнем сарказма"
+            },
+            {
+                "role": "user",
+                "content": text
+            },
+        ],
+        temperature=1.15,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,

@@ -700,10 +700,8 @@ async def MainVoid(message: types.Message):
     # soon deprecated
     gpt4_old_request_text = re.subn('^[Ж|ж]пт4[ | ]', '', MessageText)
     if gpt4_old_request_text[1] and is_gpt_allowed(message):
-        await short_reply(
-            gpt35_request(gpt4_old_request_text[0]),
-            "Эта команда устарела. Используй просто \"жпт\", если требуется GPT-4o модель.\n\n" + message
-        )
+        deprecated_note = "Эта команда устарела. Используй просто \"жпт\", если требуется GPT-4o модель.\n\n"
+        await short_reply(deprecated_note + gpt35_request(gpt4_old_request_text[0]), message)
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)

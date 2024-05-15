@@ -693,9 +693,9 @@ async def MainVoid(message: types.Message):
     if gpt_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt4o_request(gpt_request_text[0]), message)
 
-    gpt4_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
-    if gpt4_request_text[1] and is_gpt_allowed(message):
-        await short_reply(gpt35_request(gpt4_request_text[0]), message)
+    gpt35_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
+    if gpt35_request_text[1] and is_gpt_allowed(message):
+        await short_reply(gpt35_request(gpt35_request_text[0]), message)
 
     # soon deprecated
     gpt4_old_request_text = re.subn('^[Ж|ж]пт4[ | ]', '', MessageText)

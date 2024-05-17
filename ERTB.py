@@ -1318,7 +1318,7 @@ def gpt4o_request(text):
                 "content": text
             },
         ],
-        temperature=1,
+        temperature=0.65,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,
@@ -1341,7 +1341,7 @@ def gpt4o_s_request(text):
                 "content": text
             },
         ],
-        temperature=1.15,
+        temperature=0.8,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,

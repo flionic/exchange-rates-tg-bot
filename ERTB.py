@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
 import json
+from pathlib import Path
 
 # Own libraries
 import DBH
@@ -35,6 +36,11 @@ from TextHelper import LoadTexts, GetText
 import ListsCache
 import StopDDoS
 from w2n import ConvertWordsToNumber
+
+import warnings
+
+# Ignore DeprecationWarning
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # Main variables
 bot = Bot(token=botToken)
@@ -614,6 +620,26 @@ async def DeletePhrase(message: types.Message):
     result = DBH.delPhrase(messageData["chatID"], trigger)
     if result:
         return await short_reply(f'Trigger <b>{trigger}</b> is deleted', message)
+
+
+@dp.message_handler(commands=['voice'])
+async def send_voice(message: types.Message):
+    messageData = GetDataFromMessage(message)
+
+    if IsUserInBlackList(messageData["fromUserId"], messageData["chatID"]):
+        return
+    if DBH.IsAdmin(messageData["fromUserId"]):
+        voice_text = message.text.replace("/voice ", "")
+        speech_file_path = Path(__file__).parent / "temp" / "voice.wav"
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice="nova",
+            input=voice_text
+        )
+        response.stream_to_file(speech_file_path)
+        with open(speech_file_path, mode="rb") as file:
+            binary_content = file.read()
+        await bot.send_voice(chat_id=message.chat.id, voice=binary_content, reply_to_message_id=message.message_id)
 
 
 async def short_reply(text, message):

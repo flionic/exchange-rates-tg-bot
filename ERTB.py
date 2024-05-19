@@ -711,9 +711,23 @@ async def MainVoid(message: types.Message):
     if gpt_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt4o_request(gpt_request_text[0]), message)
 
+    gpt_voice_request_text = re.subn('^[Ж|ж]птв[ | ]', '', MessageText)
+    if gpt_voice_request_text[1] and is_gpt_allowed(message):
+        binary_content = gpt_voice(gpt4o_request(gpt_voice_request_text[0]))
+        await message.reply_voice(
+            voice=binary_content,
+            # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
+        )
+
     gpts_request_text = re.subn('^[Б|б]от[ | ]', '', MessageText)
     if gpts_request_text[1] and is_gpt_allowed(message):
         await short_reply(gpt4o_s_request(gpts_request_text[0]), message)
+
+    gpts_voice_request_text = re.subn('^[Б|б]отв[ | ]', '', MessageText)
+    if gpts_voice_request_text[1] and is_gpt_allowed(message):
+        await message.reply_voice(
+            voice=gpt_voice(gpt4o_request(gpts_voice_request_text[0])),
+        )
 
     gpt35_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
     if gpt35_request_text[1] and is_gpt_allowed(message):
@@ -728,14 +742,6 @@ async def MainVoid(message: types.Message):
     voice_request_text = re.subn('^[В|в]ойс[ | ]', '', MessageText)
     if voice_request_text[1] and is_gpt_allowed(message):
         binary_content = gpt_voice(voice_request_text[0])
-        await message.reply_voice(
-            voice=binary_content,
-            # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
-        )
-
-    gpt_voice_request_text = re.subn('^[Ж|ж]птв[ | ]', '', MessageText)
-    if gpt_voice_request_text[1] and is_gpt_allowed(message):
-        binary_content = gpt_voice(gpt4o_request(voice_request_text[0]))
         await message.reply_voice(
             voice=binary_content,
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])

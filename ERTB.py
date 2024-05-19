@@ -726,7 +726,7 @@ async def MainVoid(message: types.Message):
     gpts_voice_request_text = re.subn('^[Б|б]отв[ | ]', '', MessageText)
     if gpts_voice_request_text[1] and is_gpt_allowed(message):
         await message.reply_voice(
-            voice=gpt_voice(gpt4o_request(gpts_voice_request_text[0])),
+            voice=gpt_voice(gpt4o_s_request(gpts_voice_request_text[0])),
         )
 
     gpt35_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)

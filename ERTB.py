@@ -733,6 +733,14 @@ async def MainVoid(message: types.Message):
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
         )
 
+    gpt_voice_request_text = re.subn('^[Ж|ж]птв[ | ]', '', MessageText)
+    if gpt_voice_request_text[1] and is_gpt_allowed(message):
+        binary_content = gpt_voice(gpt4o_request(voice_request_text[0]))
+        await message.reply_voice(
+            voice=binary_content,
+            # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
+        )
+
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
 

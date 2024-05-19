@@ -630,16 +630,8 @@ async def send_voice(message: types.Message):
         return
     if DBH.IsAdmin(messageData["fromUserId"]):
         voice_text = message.text.replace("/voice ", "")
-        speech_file_path = Path(__file__).parent / "temp" / "voice.wav"
-        response = client.audio.speech.create(
-            model="tts-1",
-            voice="nova",
-            input=voice_text
-        )
-        response.stream_to_file(speech_file_path)
-        with open(speech_file_path, mode="rb") as file:
-            binary_content = file.read()
-        await bot.send_voice(chat_id=message.chat.id, voice=binary_content, reply_to_message_id=message.message_id)
+        binary_content = gpt_voice(voice_text)
+        await message.reply_voice(voice=binary_content)
 
 
 async def short_reply(text, message):
@@ -732,6 +724,14 @@ async def MainVoid(message: types.Message):
     if gpt4_old_request_text[1] and is_gpt_allowed(message):
         deprecated_note = "Эта команда устарела. Используй просто \"жпт\", если требуется GPT-4o модель.\n\n"
         await short_reply(deprecated_note + gpt35_request(gpt4_old_request_text[0]), message)
+
+    voice_request_text = re.subn('^[В|в]ойс[ | ]', '', MessageText)
+    if voice_request_text[1] and is_gpt_allowed(message):
+        binary_content = gpt_voice(voice_request_text[0])
+        await message.reply_voice(
+            voice=binary_content,
+            # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
+        )
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
@@ -1447,6 +1447,19 @@ def gpt_alexa():
     )
     reply_text = response.choices[0].message.content
     return reply_text
+
+
+def gpt_voice(input_text):
+    speech_file_path = Path(__file__).parent / "temp" / "voice.wav"
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="nova",
+        input=input_text
+    )
+    response.stream_to_file(speech_file_path)
+    with open(speech_file_path, mode="rb") as file:
+        binary_content = file.read()
+    return binary_content
 
 
 if __name__ == '__main__':

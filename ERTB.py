@@ -4,7 +4,7 @@ import re
 from openai import OpenAI
 
 import GetExchangeRates
-from Token import botToken, botUsername, openai_token
+from Token import botToken, botUsername, openai_token, blocked_users
 
 # Public libraries
 from aiogram import Bot, Dispatcher, executor, types
@@ -751,6 +751,8 @@ async def MainVoid(message: types.Message):
         await short_reply(gpt_alexa(), message)
 
     if with_probability(0.01):
+        if messageData["fromUserId"] in blocked_users:
+            return
         reply_text = gpt_meme(MessageText)
         await short_reply(reply_text, message)
 

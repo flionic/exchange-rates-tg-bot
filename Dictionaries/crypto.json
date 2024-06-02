@@ -581,6 +581,31 @@
           "ripple"
         ]
       }
+    },
+    {
+      "name": "NOTCOIN",
+      "code": "NOT",
+      "equal": [
+        "notcoin"
+      ],
+      "entry": {
+        "en": [
+          "not"
+        ],
+        "ru": [
+          "нот"
+        ],
+        "ua": [
+          "нот"
+        ],
+        "by": [
+          "нот"
+        ],
+        "de":
+        [
+          "not"
+        ]
+      }
     }
   ]
 }

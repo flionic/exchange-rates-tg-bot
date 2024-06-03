@@ -739,12 +739,14 @@ async def MainVoid(message: types.Message):
 
     gpts_request_text = re.subn('^[Б|б]от[ | ]', '', MessageText)
     if gpts_request_text[1] and is_gpt_allowed(message):
-        await short_reply(gpt4o_s_request(gpts_request_text[0]), message)
+        system_prompt = DBH.GetSetting(messageData["chatID"], "is_gpt_enabled", message.chat.type)
+        await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt), message)
 
     gpts_voice_request_text = re.subn('^[Б|б]отв[ | ]', '', MessageText)
     if gpts_voice_request_text[1] and is_gpt_allowed(message):
+        system_prompt = DBH.GetSetting(messageData["chatID"], "is_gpt_enabled", message.chat.type)
         await message.reply_voice(
-            voice=gpt_voice(gpt4o_s_request(gpts_voice_request_text[0])),
+            voice=gpt_voice(gpt4o_s_request(gpts_voice_request_text[0], system_prompt)),
         )
 
     gpt35_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
@@ -1378,8 +1380,8 @@ def gpt4o_request(text):
                 "content": text
             },
         ],
-        temperature=0.65,
-        max_tokens=150,
+        temperature=0.6,
+        max_tokens=200,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
@@ -1388,13 +1390,13 @@ def gpt4o_request(text):
     return reply_text
 
 
-def gpt4o_s_request(text):
+def gpt4o_s_request(text, system_prompt):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
                 "role": "system",
-                "content": f"ты даешь короткие ответы с максимальным уровнем постиронии"
+                "content": system_prompt
             },
             {
                 "role": "user",

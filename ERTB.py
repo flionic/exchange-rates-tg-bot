@@ -634,24 +634,22 @@ async def send_voice(message: types.Message):
         await message.reply_voice(voice=binary_content)
 
 
-async def short_reply(text, message):
+@dp.message_handler(commands=['setgpt'])
+async def set_system_prompt(message: types.Message):
     message_data = GetDataFromMessage(message)
-    await message.reply(
-        text,
-        parse_mode="HTML",
-        disable_web_page_preview=True,
-        reply_markup=CustomMarkup.DeleteMarkup(message_data['chatID'], message_data['chatType'])
-    )
+    group_type = message.chat.type
 
+    if IsUserInBlackList(message_data["fromUserId"], message_data["chatID"]):
+        return
 
-async def trig_is_admin(message):
-    messageData = GetDataFromMessage(message)
-    member = await message.chat.get_member(messageData["fromUserId"])
-    if DBH.IsAdmin(messageData["fromUserId"]) \
-            or member.status == "creator" \
-            or member.status == "administrator":
-        return True
-    return False
+    gpt_system_prompt = message.text.replace("/setgpt ", "")
+    DBH.SetSetting(message_data["chatID"], 'gpt_system_prompt', gpt_system_prompt, group_type)
+    reply_message = f'System prompt is updated'
+
+    await message.reply(reply_message, parse_mode="HTML",
+                        disable_web_page_preview=True,
+                        reply_markup=CustomMarkup.DeleteMarkup(message_data['chatID'],
+                                                               message_data['chatType']))
 
 
 @dp.message_handler(commands=['allow_gpt'])
@@ -676,6 +674,26 @@ async def gpt_disable(message: types.Message):
             "GPT Denied for this chat",
             message
         )
+
+
+async def short_reply(text, message):
+    message_data = GetDataFromMessage(message)
+    await message.reply(
+        text,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+        reply_markup=CustomMarkup.DeleteMarkup(message_data['chatID'], message_data['chatType'])
+    )
+
+
+async def trig_is_admin(message):
+    messageData = GetDataFromMessage(message)
+    member = await message.chat.get_member(messageData["fromUserId"])
+    if DBH.IsAdmin(messageData["fromUserId"]) \
+            or member.status == "creator" \
+            or member.status == "administrator":
+        return True
+    return False
 
 
 # Main void

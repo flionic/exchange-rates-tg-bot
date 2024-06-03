@@ -204,6 +204,7 @@ def DBIntegrityCheck():
             "currencySymbol": {"type": "INTEGER", "default": "1"},
             "lang": {"type": "TEXT", "default": "'en'"},
             "is_gpt_enabled": {"type": "INTEGER", "default": "0"},
+            "gpt_system_prompt": {"type": "TEXT", "default": "ты даешь короткие ответы по делу с каплей иронии"},
         }
         if table_exists:
             # Fetch existing columns
@@ -1435,5 +1436,18 @@ def delPhrase(chat_id, trigger):
     with sql.connect('DataBases/DataForBot.sqlite') as con:
         cursor = con.cursor()
         cursor.execute("DELETE FROM MemePhrases WHERE chatID = ? AND trigger = ?", (chat_id, trigger.lower()))
+        con.commit()
+        return True
+
+def setSystemPromptGPT(chat_id, trigger, answer, author_id):
+    chat_id = int(chat_id)
+    with sql.connect('DataBases/DataForBot.sqlite') as con:
+        if getPhrase(chat_id, trigger) is not None:
+            return False
+        cursor = con.cursor()
+        cursor.execute(
+            "INSERT INTO MemePhrases (chatID,trigger,answer,authorID) values (?,?,?,?)",
+            (chat_id, trigger.lower(), answer, author_id)
+        )
         con.commit()
         return True

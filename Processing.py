@@ -424,12 +424,12 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
 
     isCryptoLink = False
 
-    answer = ''
+    answer = '🔁 Currencies\n'
     for i in range(len(Arr[1])): #National currencies
         CurVault = float(Arr[0][i])
         CurCurrency = Arr[1][i]
         # answer += "\n" + "======" + "\n"
-        PartOfAnswer = "" + DictOfFlagsForChat[CurCurrency] + " " + str(f'{CurVault:,.2f}'.replace(","," ")) + " " + DictofSymbolsForChat[CurCurrency]
+        PartOfAnswer = "" + DictOfFlagsForChat[CurCurrency] + " " + str(f'{CurVault:,.2f}'.replace(","," ")) + " " + DictofSymbolsForChat[CurCurrency] + " = \n\n"
         
         ListOfChatCurrencies = GetAllCurrencies(chatID)
         ListOfChatCrypto = GetAllCrypto(chatID)
@@ -440,11 +440,11 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
             elif j == 'EUR':
                 Vault = round(CurVault / GetExchangeRates.exchangeRates[CurCurrency], 2)
                 Vault = f'{Vault:,.2f}'.replace(","," ")
-                PartOfAnswer += " • " + DictOfFlagsForChat[j] + " " + str(Vault) + " " + DictofSymbolsForChat[j]
+                PartOfAnswer += " \n " + DictOfFlagsForChat[j] + " " + str(Vault) + " " + DictofSymbolsForChat[j]
             elif j != 'EUR':
                 Vault = round(CurVault * (GetExchangeRates.exchangeRates[j] / GetExchangeRates.exchangeRates[CurCurrency]), 2)
                 Vault = f'{Vault:,.2f}'.replace(","," ")
-                PartOfAnswer += " • " + DictOfFlagsForChat[j] + " " + str(Vault) + " " + DictofSymbolsForChat[j]
+                PartOfAnswer += " \n " + DictOfFlagsForChat[j] + " " + str(Vault) + " " + DictofSymbolsForChat[j]
         # if CurCurrency == 'UAH' and CurVault == 40.0:
         #     PartOfAnswer += "\n👖1 штани"
         # elif CurCurrency == 'USD' and CurVault == 300.0:
@@ -458,11 +458,11 @@ def AnswerText(Arr: list, chatID: str, chatType: str) -> str:
             if CurCurrency == 'EUR':
                 Vault = round(CurVault / GetExchangeRates.exchangeRates[CurCurrency] / GetExchangeRates.cryptoRates[j], 9)
                 Vault = f'{Vault:,.9f}'.replace(","," ")
-                PartOfAnswer += " • " + TwoZeroesToOne(str(Vault)) + " " + j
+                PartOfAnswer += " \n " + TwoZeroesToOne(str(Vault)) + " " + j
             elif CurCurrency != 'EUR':
                 Vault = round(CurVault * (GetExchangeRates.exchangeRates['USD'] / GetExchangeRates.exchangeRates[CurCurrency] / GetExchangeRates.cryptoRates[j]), 9)
                 Vault = f'{Vault:,.9f}'.replace(","," ")
-                PartOfAnswer += " • " + TwoZeroesToOne(str(Vault)) + " " + j
+                PartOfAnswer += " \n " + TwoZeroesToOne(str(Vault)) + " " + j
         answer += PartOfAnswer + "\n\n"
 
     for i in range(len(Arr[3])): #Crypto

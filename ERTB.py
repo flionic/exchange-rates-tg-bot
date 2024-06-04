@@ -914,7 +914,7 @@ async def MainVoid(message: types.Message):
         #                                     reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
         #                                                                            messageData['chatType']))
         reply_message = await bot.send_message(
-            messageData["chatID"], result,
+            messageData["chatID"], f'<blockquote expandable>{result}</blockquote>',
             parse_mode="HTML", disable_web_page_preview=True,
             reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
         )

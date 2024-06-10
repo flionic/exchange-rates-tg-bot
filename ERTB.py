@@ -720,6 +720,8 @@ async def MainVoid(message: types.Message):
         return
 
     if " " not in MessageText:
+        if messageData["fromUserId"] in blocked_users:
+            return
         trigger_answer = DBH.getPhrase(messageData["chatID"], MessageText)
         if trigger_answer:
             await short_reply(trigger_answer, message)

@@ -234,7 +234,9 @@ def DBIntegrityCheck():
             "deleteButton": {"type": "INTEGER", "default": "1"},
             "flags": {"type": "INTEGER", "default": "1"},
             "currencySymbol": {"type": "INTEGER", "default": "1"},
-            "lang": {"type": "TEXT", "default": "'en'"}
+            "lang": {"type": "TEXT", "default": "'en'"},
+            "gpt_system_prompt": {"type": "TEXT", "default": "ты даешь короткие ответы по делу с каплей иронии"},
+            "is_gpt_enabled": {"type": "INTEGER", "default": "0"},
         }
         if table_exists:
             # Fetch existing columns
@@ -614,6 +616,7 @@ def CreateDataBaseTemplate():
                 currencySymbol INTEGER DEFAULT 1,
                 lang TEXT DEFAULT en,
                 is_gpt_enabled INTEGER DEFAULT 0,
+                gpt_system_prompt TEXT DEFAULT '',
             );
         """)
     with con:
@@ -623,7 +626,9 @@ def CreateDataBaseTemplate():
                 deleteButton INTEGER DEFAULT 1,
                 flags INTEGER DEFAULT 1,
                 currencySymbol INTEGER DEFAULT 1,
-                lang TEXT DEFAULT en
+                lang TEXT DEFAULT en,
+                is_gpt_enabled INTEGER DEFAULT 0,
+                gpt_system_prompt TEXT DEFAULT '',
             );
         """)
     with con:

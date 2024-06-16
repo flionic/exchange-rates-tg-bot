@@ -655,11 +655,15 @@ async def set_system_prompt(message: types.Message):
 @dp.message_handler(commands=['allow_gpt'])
 async def gpt_enable(message: types.Message):
     message_data = GetDataFromMessage(message)
+    id_from_message = message.text.replace("/allow_gpt", "").strip(' ')
+    chat_id = id_from_message if id_from_message else message_data["chatID"]
     group_type = message.chat.type
-    if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
-        DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 1, group_type)
+    if DBH.IsAdmin(message_data["fromUserId"]):
+        print(1)
+        DBH.SetSetting(chat_id, 'is_gpt_enabled', 1, group_type)
+        print(2)
         return await short_reply(
-            "GPT Allowed for this chat, usage: \n\n\"жпт сколько весит мама Тараса\"",
+            f'GPT Allowed for {chat_id} chat, usage: \n\n\"жпт сколько весит мама Тараса\"',
             message
         )
 
@@ -667,11 +671,13 @@ async def gpt_enable(message: types.Message):
 @dp.message_handler(commands=['deny_gpt'])
 async def gpt_disable(message: types.Message):
     message_data = GetDataFromMessage(message)
+    id_from_message = message.text.replace("/deny_gpt", "").strip(' ')
+    chat_id = id_from_message if id_from_message else message_data["chatID"]
     group_type = message.chat.type
-    if group_type != "private" and DBH.IsAdmin(message_data["fromUserId"]):
-        DBH.SetSetting(message_data["chatID"], 'is_gpt_enabled', 0, group_type)
+    if DBH.IsAdmin(message_data["fromUserId"]):
+        DBH.SetSetting(chat_id, 'is_gpt_enabled', 0, group_type)
         return await short_reply(
-            "GPT Denied for this chat",
+            f'GPT Denied for {chat_id} chat',
             message
         )
 

@@ -673,7 +673,6 @@ async def gpt_disable(message: types.Message):
     message_data = GetDataFromMessage(message)
     id_from_message = message.text.replace("/deny_gpt", "").strip(' ')
     chat_id = id_from_message if id_from_message else message_data["chatID"]
-    group_type = message.chat.type
     if DBH.IsAdmin(message_data["fromUserId"]):
         DBH.SetSetting(chat_id, 'is_gpt_enabled', 0, group_type)
         return await short_reply(
@@ -1389,7 +1388,7 @@ def gpt4o_request(text):
             },
         ],
         temperature=0.6,
-        max_tokens=200,
+        max_tokens=2048,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0

@@ -1326,7 +1326,8 @@ def is_gpt_allowed(message):
 
 def gpt_meme(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        # model="gpt-3.5-turbo-0125",
+        model="gpt-4o-2024-08-06",
         messages=[
             {
                 "role": "system",
@@ -1352,7 +1353,7 @@ def gpt_meme(text):
 
 def gpt35_request(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-2024-08-06",
         messages=[
             {
                 "role": "system",
@@ -1375,7 +1376,7 @@ def gpt35_request(text):
 
 def gpt4o_request(text):
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-2024-08-06",
         # model="gpt-4-turbo-2024-04-09",
         messages=[
             {
@@ -1399,7 +1400,7 @@ def gpt4o_request(text):
 
 def gpt4o_s_request(text, system_prompt):
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-2024-08-06",
         messages=[
             {
                 "role": "system",
@@ -1455,7 +1456,7 @@ X - стоимость посылки в евро
 def gpt_alexa():
     response = client.chat.completions.create(
         # model="gpt-4-turbo-2024-04-09",
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o-2024-08-06",
         messages=[
             # {
             #     "role": "user",
@@ -1482,7 +1483,7 @@ def gpt_alexa():
                 "content": "дай еще, отсчет с 1"
             },
         ],
-        temperature=0.55,
+        temperature=0.85,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,

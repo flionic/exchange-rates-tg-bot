@@ -778,9 +778,9 @@ async def MainVoid(message: types.Message):
         await short_reply(gpt_alexa(), message)
 
     # TODO: remove this meme
-    offset_date = datetime.datetime(2024, 8, 14, 5, 0)
+    offset_date = datetime.datetime(2024, 8, 14, 6, 0)
     current_date = datetime.datetime.now()
-    if with_probability(0.66) and (current_date < offset_date):
+    if with_probability(0.7) and (current_date < offset_date):
         await short_reply("Ну вот, о чём я и говорил", message)
 
     if with_probability(0.01):

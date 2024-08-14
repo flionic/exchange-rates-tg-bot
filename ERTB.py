@@ -777,6 +777,12 @@ async def MainVoid(message: types.Message):
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
 
+    # TODO: remove this meme
+    offset_date = datetime.datetime(2024, 8, 14, 8, 0)
+    current_date = datetime.datetime.now()
+    if with_probability(0.5) and (current_date < offset_date):
+        await short_reply("Ну вот, о чём я и говорил", message)
+
     if with_probability(0.01):
         if messageData["fromUserId"] in blocked_users:
             return

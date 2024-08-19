@@ -783,7 +783,7 @@ async def MainVoid(message: types.Message):
     # if with_probability(0.7) and (current_date < offset_date):
     #     await short_reply("Ну вот, о чём я и говорил", message)
 
-    if with_probability(0.025):
+    if with_probability(0.008):
         if messageData["fromUserId"] in blocked_users:
             return
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)

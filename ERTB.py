@@ -783,11 +783,13 @@ async def MainVoid(message: types.Message):
     # if with_probability(0.7) and (current_date < offset_date):
     #     await short_reply("Ну вот, о чём я и говорил", message)
 
-    if with_probability(0.01):
+    if with_probability(0.025):
         if messageData["fromUserId"] in blocked_users:
             return
-        reply_text = gpt_meme(MessageText)
-        await short_reply(reply_text, message)
+        system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
+        await short_reply(gpt4o_s_request(MessageText, system_prompt), message)
+        # reply_text = gpt_meme(MessageText)
+        # await short_reply(reply_text, message)
 
     # Logging basic information to terminal
     PrintMainInfo(message, MessageText)
@@ -1387,7 +1389,7 @@ def gpt4o_request(text):
         messages=[
             {
                 "role": "system",
-                "content": f"ты даешь короткие ответы"
+                "content": f"ты даешь не длинные ответы, не больше 2-3 абзацев"
             },
             {
                 "role": "user",

@@ -1397,7 +1397,7 @@ def gpt4o_request(text):
             },
         ],
         temperature=0.6,
-        max_tokens=2048,
+        max_tokens=3072,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
@@ -1420,7 +1420,7 @@ def gpt4o_s_request(text, system_prompt):
             },
         ],
         temperature=0.8,
-        max_tokens=150,
+        max_tokens=2048,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0
@@ -1484,14 +1484,14 @@ def gpt_alexa():
             },
             {
                 "role": "assistant",
-                "content": "1. Умер от кринжа. \n 2. Словил снаряд"
+                "content": "1. Умер от кринжа. \n 2. Словил снаряд \n 3. Наложил в штаны"
             },
             {
                 "role": "user",
                 "content": "дай еще, отсчет с 1"
             },
         ],
-        temperature=0.85,
+        temperature=1,
         max_tokens=150,
         top_p=1,
         frequency_penalty=0,

@@ -1,4 +1,5 @@
 # Token
+import base64
 import re
 
 from openai import OpenAI
@@ -1512,6 +1513,30 @@ def gpt_voice(input_text):
     with open(speech_file_path, mode="rb") as file:
         binary_content = file.read()
     return binary_content
+
+
+def gpt_audio(input_text, system_prompt):
+    audio_file_path = Path(__file__).parent / "temp" / "audio.wav"
+    completion = client.chat.completions.create(
+        model="gpt-4o-audio-preview",
+        modalities=["text", "audio"],
+        audio={"voice": "alloy", "format": "wav"},
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": input_text
+            }
+        ]
+    )
+    # print(completion.choices[0])
+    wav_bytes = base64.b64decode(completion.choices[0].message.audio.data)
+    with open(audio_file_path, "wb") as file:
+        file.write(wav_bytes)
+    return wav_bytes
 
 
 if __name__ == '__main__':

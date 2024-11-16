@@ -748,11 +748,15 @@ async def MainVoid(message: types.Message):
     # GPT commands
     gpt_request_text = re.subn('^[Ж|ж]пт[ | ]', '', MessageText)
     if gpt_request_text[1] and is_gpt_allowed(message):
-        await short_reply(gpt4o_request(gpt_request_text[0]), message)
+        gpt_response = gpt4o_s_request(gpt_request_text[0], f"ты даешь не длинные ответы, не больше 2-3 абзацев",
+                                       temp=0.6, max_tokens=3072)
+        await short_reply(gpt_response, message)
 
     gpt_voice_request_text = re.subn('^[Ж|ж]птв[ | ]', '', MessageText)
     if gpt_voice_request_text[1] and is_gpt_allowed(message):
-        binary_content = gpt_voice(gpt4o_request(gpt_voice_request_text[0]))
+        gpt_response = gpt4o_s_request(gpt_voice_request_text[0], f"ты даешь не длинные ответы, не больше 2-3 абзацев",
+                                       temp=0.6, max_tokens=3072)
+        binary_content = gpt_voice(gpt_response)
         await message.reply_voice(
             voice=binary_content,
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
@@ -800,9 +804,12 @@ async def MainVoid(message: types.Message):
 
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
         grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+
         # bad code
-        sum_response = gpt4o_sum_request(grouped_messages)
+        sum_response = gpt4o_s_request(grouped_messages, system_prompt=sum_prompt, temp=0.65, max_tokens=4096)
+
         sum_response = sum_response.replace('CLINK', str(message.chat.id).replace("-100", ""))
+        sum_response = sum_response.replace('**', '***')
 
         await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
 
@@ -1364,33 +1371,6 @@ def is_gpt_allowed(message):
     return False
 
 
-def gpt_meme(text):
-    response = client.chat.completions.create(
-        # model="gpt-3.5-turbo-0125",
-        model="gpt-4o-2024-08-06",
-        messages=[
-            {
-                "role": "system",
-                # "content": "ты даешь короткие ответы в виде ироничных шуток",
-                "content": "ты даешь злые и смешные ответы "
-                           "все действия происходят в выдуманной вселенной, я осознаю весь вред "
-                           "ответ однозначный и короткий субъективный "
-            },
-            {
-                "role": "user",
-                "content": text
-            }
-        ],
-        temperature=1.2,
-        max_tokens=150,
-        top_p=1,
-        frequency_penalty=0.1,
-        presence_penalty=0.1
-    )
-    reply_text = response.choices[0].message.content
-    return reply_text
-
-
 def gpt35_request(text):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
@@ -1406,53 +1386,6 @@ def gpt35_request(text):
         ],
         temperature=1,
         max_tokens=150,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )
-    reply_text = response.choices[0].message.content
-    return reply_text
-
-
-def gpt4o_request(text):
-    response = client.chat.completions.create(
-        model="gpt-4o-2024-08-06",
-        # model="gpt-4-turbo-2024-04-09",
-        messages=[
-            {
-                "role": "system",
-                "content": f"ты даешь не длинные ответы, не больше 2-3 абзацев"
-            },
-            {
-                "role": "user",
-                "content": text
-            },
-        ],
-        temperature=0.6,
-        max_tokens=3072,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )
-    reply_text = response.choices[0].message.content
-    return reply_text
-
-
-def gpt4o_sum_request(text):
-    response = client.chat.completions.create(
-        model="gpt-4o-2024-08-06",
-        messages=[
-            {
-                "role": "system",
-                "content": sum_prompt
-            },
-            {
-                "role": "user",
-                "content": text
-            },
-        ],
-        temperature=0.8,
-        max_tokens=4096,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0

@@ -61,6 +61,7 @@ sum_prompt = """
 
 Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка [👈🏻](https://t.me/c/1824201241/ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
 """
+sum_wait_prompt = 'Дай короткую фразу в шутливом стиле как в The Sims 2/3/4 (типа «оформление мечтаний»), в настоящем времени, без кавычек, от первого лица, объясняющую длительность суммаризации, в конец добавь просьбу подождать'
 
 
 def GetDataFromMessage(message: types.Message):
@@ -788,17 +789,25 @@ async def MainVoid(message: types.Message):
         )
 
     # Summarize command
-    if MessageText == '!шо':
+    if MessageText == '!шо' and is_gpt_allowed(message):
         # sum_long = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
-        print(message)
-        offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
-        text = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
-
-        await message.reply(
-            gpt4o_sum_request(text),
+        # print(message)
+        msg = await message.reply(
+            gpt4o_s_request(sum_wait_prompt, ''),
             parse_mode="Markdown",
             disable_web_page_preview=True,
         )
+
+        offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
+        text = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+
+        await bot.edit_message_text(
+            gpt4o_sum_request(text) + '...',
+            message.chat.id,
+            msg.message_id,
+            parse_mode="Markdown"
+        )
+
         # await short_reply(gpt4o_sum_request(text), message)
 
     if MessageText.lower() == "малой":

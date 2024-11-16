@@ -1451,7 +1451,7 @@ def gpt4o_sum_request(text):
                 "content": text
             },
         ],
-        temperature=0.5,
+        temperature=0.8,
         max_tokens=4096,
         top_p=1,
         frequency_penalty=0,

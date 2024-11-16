@@ -1370,6 +1370,8 @@ def is_gpt_allowed(message):
     if DBH.IsAdmin(message_data["fromUserId"]):
         return True
 
+    message.reply("Здесь эта команда недоступна")
+
     return False
 
 

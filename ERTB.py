@@ -792,7 +792,7 @@ async def MainVoid(message: types.Message):
         # sum_long = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
         print(message)
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
-        text = await fetch_chat_messages(message.chat.id, limit=700, offset_id=offset_id)
+        text = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
 
         await message.reply(
             gpt4o_sum_request(text),

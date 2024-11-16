@@ -56,7 +56,7 @@ sum_prompt = """
 Ты сидишь в нашем чате, и существуешь там для суммаризации диалога, чтобы помогать ребятам быть в курсе событий, не читая весь чат. Я тебе вышлю сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
 Твоя задача тезисно обобщить сообщения (используй время и связь контекста, сортируй тоже по времени) и выдать короткое саммари всех тем в примерно таком виде:
 
-***Разочарование от AirPods Pro 2.*** › [Тред](ID)
+***Разочарование от AirPods Pro 2*** › [Тред](ID)
 Юрий отметил, что звук не улучшился, обсуждали шумодав, прозрачность и тайп-C.
 
 Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка (ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
@@ -806,7 +806,7 @@ async def MainVoid(message: types.Message):
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
         grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
 
-        sum_response = gpt4o_s_request(grouped_messages, system_prompt=sum_prompt, temp=0.65, max_tokens=4096)
+        sum_response = gpt4o_s_request(grouped_messages, system_prompt=sum_prompt, temp=0.6, max_tokens=4096)
         # set links to treads instead of ids
         sum_response = sum_response.replace('](', f'](https://t.me/c/{chat_link_id}/')
         # sum_response = re.sub(r'\[(.+?)\]\((\d+)\)', rf'[\1](https://t.me/c/{chat_link_id}/\2)', sum_response)

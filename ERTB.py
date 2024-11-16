@@ -1361,7 +1361,7 @@ def with_probability(probability):
     return r < probability
 
 
-def is_gpt_allowed(message):
+async def is_gpt_allowed(message):
     message_data = GetDataFromMessage(message)
 
     if DBH.GetSetting(message_data["chatID"], "is_gpt_enabled", message.chat.type):
@@ -1370,7 +1370,7 @@ def is_gpt_allowed(message):
     if DBH.IsAdmin(message_data["fromUserId"]):
         return True
 
-    message.reply("Здесь эта команда недоступна")
+    await message.reply("Здесь эта команда недоступна")
 
     return False
 

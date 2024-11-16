@@ -13,4 +13,5 @@ async def fetch_chat_messages(chat_id, limit, offset_id):
             msg = f'{sender_name}|{message.text}|{message.date.replace(tzinfo=None)}|{message.id}'
             sum_messages.append(msg)
 
+        sum_messages.reverse()
         return '\n'.join(sum_messages)

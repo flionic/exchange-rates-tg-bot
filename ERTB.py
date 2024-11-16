@@ -54,12 +54,12 @@ client = OpenAI(api_key=openai_token)
 
 sum_prompt = """
 Ты сидишь в нашем чате, и существуешь там для суммаризации диалога, чтобы помогать ребятам быть в курсе событий, не читая весь чат. Я тебе вышлю сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
-Твоя задача тезисно обобщить сообщения (используй время и связь контекста) и выдать короткое саммари всех тем в примерно таком виде:
+Твоя задача тезисно обобщить сообщения (используй время и связь контекста, сортируй тоже по времени) и выдать короткое саммари всех тем в примерно таком виде:
 
-***Разочарование от AirPods Pro 2*** [👈🏻](https://t.me/c/CLINK/ID)
+***Разочарование от AirPods Pro 2.*** [Тред](https://t.me/c/CLINK/ID)
 Юрий отметил, что звук не улучшился, обсуждали шумодав, прозрачность и тайп-C.
 
-Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка [👈🏻](https://t.me/c/CLINK/ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
+Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка (https://t.me/c/CLINK/ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
 """
 sum_wait_prompt = 'Дай короткую фразу в шутливом стиле как в The Sims 2/3/4 (типа «оформление мечтаний»), в настоящем времени, без кавычек, от первого лица, объясняющую длительность суммаризации, в конец добавь просьбу подождать'
 
@@ -799,11 +799,12 @@ async def MainVoid(message: types.Message):
         )
 
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
-        text = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+        grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
         # bad code
-        text = text.replace('CLINK', str(message.chat.id).replace("-100", ""))
+        sum_response = gpt4o_sum_request(grouped_messages)
+        sum_response = sum_response.replace('CLINK', str(message.chat.id).replace("-100", ""))
 
-        await bot.edit_message_text(gpt4o_sum_request(text), message.chat.id, msg.message_id, parse_mode="Markdown")
+        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
@@ -1460,9 +1461,10 @@ def gpt4o_sum_request(text):
     return reply_text
 
 
-def gpt4o_s_request(text, system_prompt):
+def gpt4o_s_request(text, system_prompt, model=None, temp=None, max_tokens=None,
+                    top_p=None, frequency_penalty=None, presence_penalty=None):
     response = client.chat.completions.create(
-        model="gpt-4o-2024-08-06",
+        model=model or "gpt-4o-2024-08-06",
         messages=[
             {
                 "role": "system",
@@ -1473,11 +1475,11 @@ def gpt4o_s_request(text, system_prompt):
                 "content": text
             },
         ],
-        temperature=0.8,
-        max_tokens=2048,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
+        temperature=temp or 0.8,
+        max_tokens=max_tokens or 2048,
+        top_p=top_p or 1,
+        frequency_penalty=frequency_penalty or 0,
+        presence_penalty=presence_penalty or 0
     )
     reply_text = response.choices[0].message.content
     return reply_text

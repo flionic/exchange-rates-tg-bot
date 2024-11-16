@@ -2,10 +2,12 @@
 import base64
 import re
 
+from PIL.ImageChops import offset
 from openai import OpenAI
 
 import GetExchangeRates
 from Token import botToken, botUsername, openai_token, blocked_users
+from userbot.fetch_messages import fetch_chat_messages
 
 # Public libraries
 from aiogram import Bot, Dispatcher, executor, types
@@ -49,6 +51,16 @@ dp = Dispatcher(bot)
 IsStartedCount = False
 
 client = OpenAI(api_key=openai_token)
+
+sum_prompt = """
+Ты сидишь в нашем чате, и существуешь там для суммаризации диалога, чтобы помогать ребятам быть в курсе событий, не читая весь чат. Я тебе вышлю сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
+Твоя задача тезисно обобщить сообщения (используй время и связь контекста) и выдать короткое саммари всех тем в примерно таком виде:
+
+***Разочарование от AirPods Pro 2*** [👈🏻](https://t.me/c/1824201241/ID)
+Юрий отметил, что звук не улучшился, обсуждали шумодав, прозрачность и тайп-C.
+
+Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка [👈🏻](https://t.me/c/1824201241/ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
+"""
 
 
 def GetDataFromMessage(message: types.Message):
@@ -775,6 +787,20 @@ async def MainVoid(message: types.Message):
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
         )
 
+    # Summarize command
+    if '!шо' in MessageText:
+        # sum_long = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
+        print(message)
+        offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
+        text = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+
+        await message.reply(
+            gpt4o_sum_request(text),
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+        )
+        # await short_reply(gpt4o_sum_request(text), message)
+
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
 
@@ -1407,6 +1433,29 @@ def gpt4o_request(text):
     return reply_text
 
 
+def gpt4o_sum_request(text):
+    response = client.chat.completions.create(
+        model="gpt-4o-2024-08-06",
+        messages=[
+            {
+                "role": "system",
+                "content": sum_prompt
+            },
+            {
+                "role": "user",
+                "content": text
+            },
+        ],
+        temperature=0.5,
+        max_tokens=4096,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    reply_text = response.choices[0].message.content
+    return reply_text
+
+
 def gpt4o_s_request(text, system_prompt):
     response = client.chat.completions.create(
         model="gpt-4o-2024-08-06",
@@ -1464,21 +1513,8 @@ X - стоимость посылки в евро
 
 def gpt_alexa():
     response = client.chat.completions.create(
-        # model="gpt-4-turbo-2024-04-09",
         model="gpt-3.5-turbo-0125",
         messages=[
-            # {
-            #     "role": "user",
-            #     "content": "способы самоубийства (могут повторяться)"
-            # },
-            # {
-            #     "role": "assistant",
-            #     "content": "Повесился, застрелился"
-            # },
-            # {
-            #     "role": "user",
-            #     "content": "дай еще"
-            # },
             {
                 "role": "user",
                 "content": "смешные способы самоубийста (ответ в прошлом)"

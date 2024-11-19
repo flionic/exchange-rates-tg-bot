@@ -1500,14 +1500,14 @@ def mistral_request(text, system_prompt=None):
 
 def groq_request(text, system_prompt=None):
     groq_client = Groq(
-        api_key=os.environ.get(groq_apikey),
+        api_key=groq_apikey,
     )
 
     groq_chat_completion = groq_client.chat.completions.create(
         messages=[
             {
                 "role": "system",
-                "content": system_prompt,
+                "content": system_prompt or "",
             },
             {
                 "role": "user",

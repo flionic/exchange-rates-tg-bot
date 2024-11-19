@@ -4,9 +4,10 @@ import re
 
 from PIL.ImageChops import offset
 from openai import OpenAI
+from mistralai import Mistral
 
 import GetExchangeRates
-from Token import botToken, botUsername, openai_token, blocked_users
+from Token import botToken, botUsername, openai_token, blocked_users, mistral_apikey
 from userbot.fetch_messages import fetch_chat_messages
 
 # Public libraries
@@ -768,6 +769,11 @@ async def MainVoid(message: types.Message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
         await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18"), message)
 
+    gpts_request_text = re.subn('^[Б|б]от2[ | ]', '', MessageText)
+    if gpts_request_text[1] and is_gpt_allowed(message):
+        system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
+        await short_reply(mistral_request(gpts_request_text[0], system_prompt), message)
+
     gpts_voice_request_text = re.subn('^[Б|б]отв[ | ]', '', MessageText)
     if gpts_voice_request_text[1] and is_gpt_allowed(message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
@@ -815,6 +821,26 @@ async def MainVoid(message: types.Message):
         # set links to treads instead of ids
         sum_response = sum_response.replace('](', f'](https://t.me/c/{chat_link_id}/')
         # sum_response = re.sub(r'\[(.+?)\]\((\d+)\)', rf'[\1](https://t.me/c/{chat_link_id}/\2)', sum_response)
+        # fix markdown if gpt is wrong
+        sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
+
+        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
+
+
+    if MessageText == '!шо2' and is_gpt_allowed(message):
+        msg = await message.reply(
+            mistral_request(sum_wait_prompt) + '...',
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+        )
+
+        chat_link_id = str(message.chat.id).replace("-100", "")
+        offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
+        grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+
+        sum_response = mistral_request(grouped_messages, sum_prompt)
+        # set links to treads instead of ids
+        sum_response = sum_response.replace('](', f'](https://t.me/c/{chat_link_id}/')
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
@@ -1424,6 +1450,29 @@ def gpt4o_s_request(text, system_prompt, model=None, temp=None, max_tokens=None,
         presence_penalty=presence_penalty or 0
     )
     reply_text = response.choices[0].message.content
+    return reply_text
+
+
+def mistral_request(text, system_prompt=None):
+    model = "mistral-large-latest"
+
+    mistral_client = Mistral(api_key=mistral_apikey)
+
+    chat_response = mistral_client.chat.complete(
+        model=model,
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt or ""
+            },
+            {
+                "role": "user",
+                "content": text,
+            },
+        ]
+    )
+
+    reply_text = chat_response.choices[0].message.content
     return reply_text
 
 

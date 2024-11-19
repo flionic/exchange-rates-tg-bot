@@ -3,11 +3,12 @@ import base64
 import re
 
 from PIL.ImageChops import offset
+from groq import Groq
 from openai import OpenAI
 from mistralai import Mistral
 
 import GetExchangeRates
-from Token import botToken, botUsername, openai_token, blocked_users, mistral_apikey
+from Token import botToken, botUsername, openai_token, blocked_users, mistral_apikey, groq_apikey
 from userbot.fetch_messages import fetch_chat_messages
 
 # Public libraries
@@ -846,6 +847,27 @@ async def MainVoid(message: types.Message):
 
         await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
 
+
+    if MessageText == '!шо3' and is_gpt_allowed(message):
+        msg = await message.reply(
+            groq_request(sum_wait_prompt) + '...',
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+        )
+
+        chat_link_id = str(message.chat.id).replace("-100", "")
+        offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
+        grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+
+        sum_response = groq_request(grouped_messages, sum_prompt)
+        # set links to treads instead of ids
+        sum_response = sum_response.replace('](', f'](https://t.me/c/{chat_link_id}/')
+        # fix markdown if gpt is wrong
+        sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
+
+        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
+
+
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)
 
@@ -1473,6 +1495,28 @@ def mistral_request(text, system_prompt=None):
     )
 
     reply_text = chat_response.choices[0].message.content
+    return reply_text
+
+
+def groq_request(text, system_prompt=None):
+    groq_client = Groq(
+        api_key=os.environ.get(groq_apikey),
+    )
+
+    groq_chat_completion = groq_client.chat.completions.create(
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {
+                "role": "user",
+                "content": text,
+            }
+        ],
+        model="llama3-8b-8192",
+    )
+    reply_text = groq_chat_completion.choices[0].message.content
     return reply_text
 
 

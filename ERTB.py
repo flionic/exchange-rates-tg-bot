@@ -766,13 +766,13 @@ async def MainVoid(message: types.Message):
     gpts_request_text = re.subn('^[Б|б]от[ | ]', '', MessageText)
     if gpts_request_text[1] and is_gpt_allowed(message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
-        await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt), message)
+        await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18"), message)
 
     gpts_voice_request_text = re.subn('^[Б|б]отв[ | ]', '', MessageText)
     if gpts_voice_request_text[1] and is_gpt_allowed(message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
         await message.reply_voice(
-            voice=gpt_voice(gpt4o_s_request(gpts_voice_request_text[0], system_prompt)),
+            voice=gpt_voice(gpt4o_s_request(gpts_voice_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18")),
         )
 
     gpt35_request_text = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)

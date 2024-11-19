@@ -806,7 +806,12 @@ async def MainVoid(message: types.Message):
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
         grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
 
-        sum_response = gpt4o_s_request(grouped_messages, system_prompt=sum_prompt, temp=0.6, max_tokens=4096)
+        sum_response = gpt4o_s_request(
+            grouped_messages,
+            model="gpt-4o-mini-2024-07-18",
+            system_prompt=sum_prompt,
+            temp=0.6, max_tokens=4096
+        )
         # set links to treads instead of ids
         sum_response = sum_response.replace('](', f'](https://t.me/c/{chat_link_id}/')
         # sum_response = re.sub(r'\[(.+?)\]\((\d+)\)', rf'[\1](https://t.me/c/{chat_link_id}/\2)', sum_response)

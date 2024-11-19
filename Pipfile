@@ -15,7 +15,6 @@ pandas = "==2.0.1"
 matplotlib = "==3.7.2"
 zahlwort2num = "==0.4.2"
 openai = "*"
-mistralai = "*"
 
 [dev-packages]
 

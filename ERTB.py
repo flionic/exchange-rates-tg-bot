@@ -857,7 +857,7 @@ async def MainVoid(message: types.Message):
 
         chat_link_id = str(message.chat.id).replace("-100", "")
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
-        grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+        grouped_messages = await fetch_chat_messages(message.chat.id, limit=300, offset_id=offset_id)
 
         sum_response = groq_request(grouped_messages, sum_prompt)
         # set links to treads instead of ids
@@ -881,7 +881,7 @@ async def MainVoid(message: types.Message):
         if messageData["fromUserId"] in blocked_users:
             return
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
-        await short_reply(gpt4o_s_request(MessageText, system_prompt), message)
+        await short_reply(gpt4o_s_request(MessageText, system_prompt, model="gpt-4o-mini-2024-07-18"), message)
         # reply_text = gpt_meme(MessageText)
         # await short_reply(reply_text, message)
 
@@ -1507,7 +1507,7 @@ def groq_request(text, system_prompt=None):
         messages=[
             {
                 "role": "system",
-                "content": system_prompt or "",
+                "content": (system_prompt or "") + "Всегда говори на русском.",
             },
             {
                 "role": "user",

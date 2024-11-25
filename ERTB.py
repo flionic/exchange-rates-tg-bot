@@ -801,16 +801,17 @@ async def MainVoid(message: types.Message):
         )
 
     voice_request_text = re.subn('^[А|а]удио[ | ]', '', MessageText)
-    if voice_request_text[1] and DBH.IsAdmin(messageData["fromUserId"]):
-        binary_content = gpt_audio(voice_request_text[1], "")
-        await message.reply_voice(
-            voice=binary_content,
-            # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
-        )
-    # else:
-    #     await message.reply("Тебе не разрешена эта команда, соси",
-    #                     reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-    #                                                            messageData['chatType']))
+    if voice_request_text[1]:
+        if DBH.IsAdmin(messageData["fromUserId"]):
+            binary_content = gpt_audio(voice_request_text[1], "")
+            await message.reply_voice(
+                voice=binary_content,
+                # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
+            )
+        else:
+            await message.reply("Тебе не разрешена эта команда, соси",
+                            reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                                   messageData['chatType']))
 
     # Summarize command
     if MessageText == '!шо' and is_gpt_allowed(message):

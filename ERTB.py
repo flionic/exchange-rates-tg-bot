@@ -800,6 +800,18 @@ async def MainVoid(message: types.Message):
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
         )
 
+    voice_request_text = re.subn('^[А|а]удио[ | ]', '', MessageText)
+    if voice_request_text[1] and DBH.IsAdmin(messageData["fromUserId"]):
+        binary_content = gpt_audio(voice_request_text[1], "")
+        await message.reply_voice(
+            voice=binary_content,
+            # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
+        )
+    else:
+        await message.reply("Тебе не разрешена эта команда, соси",
+                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+                                                               messageData['chatType']))
+
     # Summarize command
     if MessageText == '!шо' and is_gpt_allowed(message):
         # sum_long = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
@@ -1601,7 +1613,7 @@ def gpt_audio(input_text, system_prompt):
         messages=[
             {
                 "role": "system",
-                "content": system_prompt
+                "content": system_prompt or ""
             },
             {
                 "role": "user",

@@ -803,7 +803,7 @@ async def MainVoid(message: types.Message):
     voice_request_text = re.subn('^[А|а]удио[ | ]', '', MessageText)
     if voice_request_text[1]:
         if DBH.IsAdmin(messageData["fromUserId"]):
-            binary_content = gpt_audio(voice_request_text[1], "")
+            binary_content = gpt_audio(voice_request_text[1], "Ты просто бот-помощник")
             await message.reply_voice(
                 voice=binary_content,
                 # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
@@ -1614,7 +1614,7 @@ def gpt_audio(input_text, system_prompt):
         messages=[
             {
                 "role": "system",
-                "content": system_prompt or ""
+                "content": system_prompt or " "
             },
             {
                 "role": "user",

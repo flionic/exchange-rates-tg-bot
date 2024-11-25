@@ -807,10 +807,10 @@ async def MainVoid(message: types.Message):
             voice=binary_content,
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
         )
-    else:
-        await message.reply("Тебе не разрешена эта команда, соси",
-                        reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
-                                                               messageData['chatType']))
+    # else:
+    #     await message.reply("Тебе не разрешена эта команда, соси",
+    #                     reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'],
+    #                                                            messageData['chatType']))
 
     # Summarize command
     if MessageText == '!шо' and is_gpt_allowed(message):

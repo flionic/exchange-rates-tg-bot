@@ -800,10 +800,10 @@ async def MainVoid(message: types.Message):
             # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])
         )
 
-    voice_request_text = re.subn('^[А|а]удио[ | ]', '', MessageText)
-    if voice_request_text[1]:
+    audio_request_text = re.subn('^[А|а]удио[ | ]', '', MessageText)
+    if audio_request_text[1]:
         if DBH.IsAdmin(messageData["fromUserId"]):
-            binary_content = gpt_audio(voice_request_text[1], "Ты просто бот-помощник")
+            binary_content = gpt_audio(audio_request_text[1], "Ты просто бот-помощник")
             await message.reply_voice(
                 voice=binary_content,
                 # reply_markup=CustomMarkup.DeleteMarkup(messageData['chatID'], messageData['chatType'])

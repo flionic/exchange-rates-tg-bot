@@ -741,13 +741,6 @@ async def MainVoid(message: types.Message):
     if MessageText is None or MessageText == "":
         return
 
-    if " " not in MessageText:
-        if messageData["fromUserId"] in blocked_users:
-            return
-        trigger_answer = DBH.getPhrase(messageData["chatID"], MessageText)
-        if trigger_answer:
-            await short_reply(trigger_answer, message)
-
     # GPT commands
     gpt_request_text = re.subn('^[Ж|ж]пт[ | ]', '', MessageText)
     if gpt_request_text[1] and is_gpt_allowed(message):
@@ -880,6 +873,13 @@ async def MainVoid(message: types.Message):
 
         await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
 
+    # Blocked users
+    if " " not in MessageText:
+        if messageData["fromUserId"] in blocked_users:
+            return
+        trigger_answer = DBH.getPhrase(messageData["chatID"], MessageText)
+        if trigger_answer:
+            await short_reply(trigger_answer, message)
 
     if MessageText.lower() == "малой":
         await short_reply(gpt_alexa(), message)

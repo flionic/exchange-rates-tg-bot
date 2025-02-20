@@ -829,7 +829,7 @@ async def MainVoid(message: types.Message):
         sum_response = gpt4o_s_request(
             grouped_messages,
             model="gpt-4o-mini-2024-07-18",
-            system_prompt=sum_prompt,
+            system_prompt=sum_prompt + " translate answer to English" if MessageText == '!what' else '',
             temp=0.6, max_tokens=4096
         )
         # set links to treads instead of ids

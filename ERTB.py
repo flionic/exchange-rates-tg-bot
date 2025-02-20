@@ -763,6 +763,13 @@ async def MainVoid(message: types.Message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
         await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18"), message)
 
+    # kostyl
+    gpts_request_text = re.subn('^[B|b]ot[ | ]', '', MessageText)
+    if gpts_request_text[1] and is_gpt_allowed(message):
+        system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
+        await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18"), message)
+
+
     gpts_request_text = re.subn('^[Б|б]от2[ | ]', '', MessageText)
     if gpts_request_text[1] and is_gpt_allowed(message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
@@ -807,7 +814,7 @@ async def MainVoid(message: types.Message):
                                                                    messageData['chatType']))
 
     # Summarize command
-    if MessageText == '!шо' and is_gpt_allowed(message):
+    if (MessageText == '!шо' or MessageText == '!what') and is_gpt_allowed(message):
         # sum_long = re.subn('^[Ж|ж]пт3[ | ]', '', MessageText)
         msg = await message.reply(
             gpt35_request(sum_wait_prompt) + '...',

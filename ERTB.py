@@ -850,6 +850,12 @@ async def MainVoid(message: types.Message):
 
     # Summarize command
     if MessageText == '!био' and is_gpt_allowed(message):
+        msg = await message.reply(
+            gpt35_request(sum_wait_prompt) + '...',
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+        )
+
         chat_link_id = str(message.chat.id).replace("-100", "")
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
         grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)

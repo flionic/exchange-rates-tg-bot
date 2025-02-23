@@ -63,10 +63,16 @@ sum_prompt = """
 
 Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка (ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
 
-В конце сообщения составь мини-био по каждому из участника чата. Пример Гойданис имеет слабое интернет подключение и любит делать DFU.
+В конце сообщения составь мини-био по каждому из участника чата. Пример: "Иннокентий имеет слабое интернет подключение и любит делать DFU."
 """
 sum_wait_prompt = 'Тебе поставили задачу по суммаризации чата, нужно дать короткий текст (до 10 слов) на период ождиания (ответ без комментариев)'
 
+bio_prompt = """
+Ты находишься в групповом чате, твоя задача составлять мини-био о персонаже на основе его общения. 
+Ты получишь сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
+Давай ответ в формате: ***имя отправителя*** текст минибио
+каждое био с новой строки
+"""
 
 def GetDataFromMessage(message: types.Message):
     data = {}
@@ -832,6 +838,26 @@ async def MainVoid(message: types.Message):
             grouped_messages,
             model="gpt-4o-mini-2024-07-18",
             system_prompt=sum_prompt,
+            temp=0.6, max_tokens=4096
+        )
+        # set links to treads instead of ids
+        sum_response = sum_response.replace('](', f'](https://t.me/c/{chat_link_id}/')
+        # sum_response = re.sub(r'\[(.+?)\]\((\d+)\)', rf'[\1](https://t.me/c/{chat_link_id}/\2)', sum_response)
+        # fix markdown if gpt is wrong
+        sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
+
+        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
+
+    # Summarize command
+    if MessageText == '!био' and is_gpt_allowed(message):
+        chat_link_id = str(message.chat.id).replace("-100", "")
+        offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
+        grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+
+        sum_response = gpt4o_s_request(
+            grouped_messages,
+            model="gpt-4o-mini-2024-07-18",
+            system_prompt=bio_prompt,
             temp=0.6, max_tokens=4096
         )
         # set links to treads instead of ids

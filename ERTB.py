@@ -9,7 +9,7 @@ from mistralai import Mistral
 
 import GetExchangeRates
 from Token import botToken, botUsername, openai_token, blocked_users, mistral_apikey, groq_apikey
-from userbot.fetch_messages import fetch_chat_messages
+from userbot.fetch_messages import fetch_chat_messages, fetch_chat_participants
 
 # Public libraries
 from aiogram import Bot, Dispatcher, executor, types
@@ -66,13 +66,6 @@ sum_prompt = """
 В конце сообщения составь мини-био по каждому из участника чата. Пример: "Иннокентий имеет слабое интернет подключение и любит делать DFU."
 """
 sum_wait_prompt = 'Тебе поставили задачу по суммаризации чата, нужно дать короткий текст (до 10 слов) на период ождиания (ответ без комментариев)'
-
-bio_prompt = """
-Ты находишься в групповом чате, твоя задача составлять мини-био в шутливой форме о человеке на основе его общения. Отмечай за что можно подъебать человека. 
-Ты получишь сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
-Ответ в формате: ***имя (кличка, ее нужно придумать на основе сообщений)*** текст мини-био
-Каждое био с новой строки, только уникальные факты про человека, в ответе должны быть все имена людей.
-"""
 
 def GetDataFromMessage(message: types.Message):
     data = {}
@@ -859,6 +852,15 @@ async def MainVoid(message: types.Message):
         chat_link_id = str(message.chat.id).replace("-100", "")
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
         grouped_messages = await fetch_chat_messages(message.chat.id, limit=500, offset_id=offset_id)
+        chat_participants = await fetch_chat_participants(message.chat.id)
+
+        bio_prompt = f"""
+        Ты находишься в групповом чате, твоя задача составлять мини-био в шутливой форме о человеке на основе его общения. Отмечай за что можно подъебать человека. 
+        Ты получишь сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
+        Ответ в формате: ***имя (кличка, ее нужно придумать на основе сообщений)*** текст мини-био
+        Каждое био с новой строки, только уникальные факты про человека.
+        Вот список людей, по каждому нужно био: {chat_participants}.
+        """
 
         sum_response = gpt4o_s_request(
             grouped_messages,

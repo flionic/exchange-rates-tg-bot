@@ -1,3 +1,6 @@
+from telethon.tl.functions.channels import GetParticipantsRequest
+from telethon.tl.types import InputChannel
+
 from Token import api_id, api_hash
 
 from telethon import TelegramClient
@@ -19,3 +22,11 @@ async def fetch_chat_messages(chat_id, limit, offset_id):
 
         sum_messages.reverse()
         return '\n'.join(sum_messages)
+
+
+async def fetch_chat_participants(chat_id):
+    async with TelegramClient('./userbot/yourdev', api_id, api_hash) as client:
+        participants = await client.get_participants(chat_id)
+        usernames = ', '.join(participant.username for participant in participants if participant.username)
+
+        return usernames

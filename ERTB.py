@@ -58,7 +58,7 @@ sum_prompt = """
 Ты сидишь в нашем чате, и существуешь там для суммаризации диалога, чтобы помогать ребятам быть в курсе событий, не читая весь чат. Я тебе вышлю сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
 Твоя задача тезисно обобщить сообщения (используй время и связь контекста, сортируй тоже по времени) и выдать короткое саммари всех тем в примерно таком виде:
 
-***Разочарование от AirPods Pro 2*** › [Тред](ID)
+**Разочарование от AirPods Pro 2** › [Тред](ID)
 Юрий отметил, что звук не улучшился, обсуждали шумодав, прозрачность и тайп-C.
 
 Помимо этого, тебе необходимо обозначать с какого именно сообщения началась тема. В примере есть строка (ID), тебе необходимо в ней заменять ID на id сообщения, с которого началась тема.
@@ -837,7 +837,7 @@ async def MainVoid(message: types.Message):
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
-        reply_text = f"Треды за последние 500 сообщений: \n\n<blockquote expandable>{sum_response}</blockquote>"
+        reply_text = f"Треды за последние 500 сообщений: \n\n{sum_response}"
         await bot.edit_message_text(reply_text, message.chat.id, msg.message_id, parse_mode="Markdown")
 
     # Summarize command
@@ -858,7 +858,7 @@ async def MainVoid(message: types.Message):
         Ты получишь сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
         Каждое био с новой строки, только уникальные факты про человека.
         Вот список людей, по каждому нужно био: {chat_participants}.
-        Не придумывай био от себя, если человека не было среди сообщений – так и пиши.
+        Не придумывай био от себя, если человека вообще не было среди сообщений – пропускай его, если же хоть одно сообщение было - должно быть био.
         Пример ответа:
         <b>имя (кличка, ее нужно придумать на основе сообщений)</b>
         текст мини-био
@@ -879,11 +879,22 @@ async def MainVoid(message: types.Message):
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
-        reply_message = f"Короткое био на основе последних 500 сообщений: \n\n<blockquote expandable>{sum_response}</blockquote>"
+        print(sum_response)
+        # reply_message = f"***Короткое био на основе последних 500 сообщений***: \n\n***>{fix_markdown2(sum_response)}"
+        reply_message = f"<b>Короткое био на основе последних 500 сообщений</b>: \n\n<blockquote expandable>{sum_response}</blockquote>"
         await bot.edit_message_text(
             reply_message,
             message.chat.id, msg.message_id, parse_mode="HTML"
         )
+        # try:
+        #     reply_message = f"***Короткое био на основе последних 500 сообщений***: \n\n***>{fix_markdown2(sum_response)}"
+        #     await bot.edit_message_text(
+        #         reply_message,
+        #         message.chat.id, msg.message_id, parse_mode="MarkdownV2"
+        #     )
+        # except Exception as e:
+        #     print(e)
+        #     await bot.edit_message_text(str(f"<b>Error</b>: {e}"), message.chat.id, msg.message_id, parse_mode="HTML")
 
 
     if MessageText == '!шо2' and is_gpt_allowed(message):
@@ -915,7 +926,7 @@ async def MainVoid(message: types.Message):
 
         chat_link_id = str(message.chat.id).replace("-100", "")
         offset_id = message.reply_to_message.message_id if "reply_to_message" in message else 0
-        grouped_messages = await fetch_chat_messages(message.chat.id, limit=300, offset_id=offset_id)
+        grouped_messages = await fetch_chat_messages(message.chat.id, limit=100, offset_id=offset_id)
 
         sum_response = groq_request(grouped_messages, sum_prompt)
         # set links to treads instead of ids
@@ -923,7 +934,7 @@ async def MainVoid(message: types.Message):
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
-        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
+        await bot.edit_message_text(f"**>{sum_response}", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
 
     # Blocked users
     if " " not in MessageText:
@@ -1471,6 +1482,13 @@ def save_error_to_file(exception_type, exception_value, exception_traceback):
 
 def exception_handler(exception_type, exception_value, exception_traceback):
     logging.error("An error occurred", exc_info=(exception_type, exception_value, exception_traceback))
+    # try:
+    #     bot.send_message(
+    #         569865720,
+    #         f"{exception_type}: {exception_value} <blockquote expandable>{exception_traceback}</blockquote>", parse_mode="HTML"
+    #     )
+    # except Exception as e:
+    #     print(e)
     save_error_to_file(exception_type, exception_value, exception_traceback)
 
 
@@ -1679,6 +1697,11 @@ def gpt_audio(input_text, system_prompt):
     with open(audio_file_path, "wb") as file:
         file.write(wav_bytes)
     return wav_bytes
+
+
+def fix_markdown2(text):
+    fixed_text = re.sub(r'[\[\]()~#\+\-={}.!]', lambda x: '\\' + x.group(), text)
+    return fixed_text
 
 
 if __name__ == '__main__':

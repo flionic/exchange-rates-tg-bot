@@ -27,8 +27,6 @@ async def fetch_chat_messages(chat_id, limit, offset_id):
 async def fetch_chat_participants(chat_id):
     async with TelegramClient('./userbot/yourdev', api_id, api_hash) as client:
         participants = await client.get_participants(chat_id)
-        print(111)
-        print(participants)
         chat_participants = ', '.join(participant.first_name for participant in participants if participant.first_name)
 
         return chat_participants

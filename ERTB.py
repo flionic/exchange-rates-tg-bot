@@ -837,12 +837,13 @@ async def MainVoid(message: types.Message):
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
-        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
+        reply_text = f"Треды за последние 500 сообщений: \n\n<blockquote expandable>{sum_response}</blockquote>"
+        await bot.edit_message_text(reply_text, message.chat.id, msg.message_id, parse_mode="HTML")
 
     # Summarize command
     if MessageText == '!био' and is_gpt_allowed(message):
         msg = await message.reply(
-            gpt35_request(sum_wait_prompt) + '...',
+            "Ушел готовить био, это будет долго, жди...",
             parse_mode="Markdown",
             disable_web_page_preview=True,
         )
@@ -878,7 +879,10 @@ async def MainVoid(message: types.Message):
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
-        await bot.edit_message_text(sum_response, message.chat.id, msg.message_id, parse_mode="Markdown")
+        await bot.edit_message_text(
+            f"<blockquote expandable>{sum_response}</blockquote>",
+             message.chat.id, msg.message_id, parse_mode="HTML"
+        )
 
 
     if MessageText == '!шо2' and is_gpt_allowed(message):

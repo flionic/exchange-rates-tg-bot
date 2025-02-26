@@ -838,7 +838,7 @@ async def MainVoid(message: types.Message):
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
         reply_text = f"Треды за последние 500 сообщений: \n\n<blockquote expandable>{sum_response}</blockquote>"
-        await bot.edit_message_text(reply_text, message.chat.id, msg.message_id, parse_mode="HTML")
+        await bot.edit_message_text(reply_text, message.chat.id, msg.message_id, parse_mode="Markdown")
 
     # Summarize command
     if MessageText == '!био' and is_gpt_allowed(message):
@@ -860,10 +860,10 @@ async def MainVoid(message: types.Message):
         Вот список людей, по каждому нужно био: {chat_participants}.
         Не придумывай био от себя, если человека не было среди сообщений – так и пиши.
         Пример ответа:
-        ***имя (кличка, ее нужно придумать на основе сообщений)***
+        <b>имя (кличка, ее нужно придумать на основе сообщений)</b>
         текст мини-био
         
-        ***имя (кличка, ее нужно придумать на основе сообщений)***
+        <b>имя (кличка, ее нужно придумать на основе сообщений)</b>
         текст мини-био
         """
 
@@ -879,9 +879,10 @@ async def MainVoid(message: types.Message):
         # fix markdown if gpt is wrong
         sum_response = re.sub(r'(?<!\*)\*\*(?!\*)(.+?)(?<!\*)\*\*(?!\*)', r'***\1***', sum_response)
 
+        reply_message = f"Короткое био на основе последних 500 сообщений: \n\n<blockquote expandable>{sum_response}</blockquote>"
         await bot.edit_message_text(
-            f"<blockquote expandable>{sum_response}</blockquote>",
-             message.chat.id, msg.message_id, parse_mode="HTML"
+            reply_message,
+            message.chat.id, msg.message_id, parse_mode="HTML"
         )
 
 

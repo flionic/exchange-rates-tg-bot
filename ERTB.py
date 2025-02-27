@@ -881,7 +881,7 @@ async def MainVoid(message: types.Message):
 
         print(sum_response)
         # reply_message = f"***Короткое био на основе последних 500 сообщений***: \n\n***>{fix_markdown2(sum_response)}"
-        reply_message = f"<b>Короткое био на основе последних 500 сообщений</b>: \n\n<blockquote expandable>{sum_response}</blockquote>"
+        reply_message = f"<b>Короткое био на основе последних 500 сообщений</b>: \n<blockquote expandable>{sum_response}</blockquote>"
         await bot.edit_message_text(
             reply_message,
             message.chat.id, msg.message_id, parse_mode="HTML"

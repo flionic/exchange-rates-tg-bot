@@ -52,7 +52,8 @@ bot = Bot(token=botToken)
 dp = Dispatcher(bot)
 IsStartedCount = False
 
-client = OpenAI(api_key=openai_token)
+client = OpenAI(base_url="https://gpt.softteam.dev/v1", api_key="key")
+client_official = OpenAI(api_key=openai_token)
 
 sum_prompt = """
 Ты сидишь в нашем чате, и существуешь там для суммаризации диалога, чтобы помогать ребятам быть в курсе событий, не читая весь чат. Я тебе вышлю сообщения в формате: имя|текст сообщения|дата сообщения|айди сообщения
@@ -1513,7 +1514,7 @@ def is_gpt_allowed(message):
 
 def gpt35_request(text):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-5-nano",
         messages=[
             {
                 "role": "system",
@@ -1537,7 +1538,7 @@ def gpt35_request(text):
 def gpt4o_s_request(text, system_prompt, model=None, temp=None, max_tokens=None,
                     top_p=None, frequency_penalty=None, presence_penalty=None):
     response = client.chat.completions.create(
-        model=model or "gpt-4o-2024-08-06",
+        model=model or "gpt-5",
         messages=[
             {
                 "role": "system",
@@ -1605,7 +1606,7 @@ def groq_request(text, system_prompt=None):
 
 def gpt4_parcel(text):
     response = client.chat.completions.create(
-        model="gpt-4-turbo-2024-04-09",
+        model="gpt-5",
         messages=[
             {
                 "role": "system",
@@ -1637,7 +1638,7 @@ X - стоимость посылки в евро
 
 def gpt_alexa():
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-5-nano",
         messages=[
             {
                 "role": "user",
@@ -1664,8 +1665,8 @@ def gpt_alexa():
 
 def gpt_voice(input_text):
     speech_file_path = Path(__file__).parent / "temp" / "voice.wav"
-    response = client.audio.speech.create(
-        model="tts-1",
+    response = client_official.audio.speech.create(
+        model="gpt-4o-mini-tts",
         voice="nova",
         input=input_text
     )
@@ -1677,8 +1678,8 @@ def gpt_voice(input_text):
 
 def gpt_audio(input_text, system_prompt):
     audio_file_path = Path(__file__).parent / "temp" / "audio.wav"
-    completion = client.chat.completions.create(
-        model="gpt-4o-audio-preview",
+    completion = client_official.chat.completions.create(
+        model="gpt-audio-mini",
         modalities=["text", "audio"],
         audio={"voice": "alloy", "format": "wav"},
         messages=[

@@ -761,13 +761,13 @@ async def MainVoid(message: types.Message):
     gpts_request_text = re.subn('^[Б|б]от[ | ]', '', MessageText)
     if gpts_request_text[1] and is_gpt_allowed(message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
-        await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18"), message)
+        await short_reply(gpt5mini_off_request(gpts_request_text[0], system_prompt), message)
 
     # kostyl
     gpts_request_text = re.subn('^[B|b]ot[ | ]', '', MessageText)
     if gpts_request_text[1] and is_gpt_allowed(message):
         system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
-        await short_reply(gpt4o_s_request(gpts_request_text[0], system_prompt, model="gpt-4o-mini-2024-07-18"), message)
+        await short_reply(gpt5mini_off_request(gpts_request_text[0], system_prompt), message)
 
 
     gpts_request_text = re.subn('^[Б|б]от2[ | ]', '', MessageText)
@@ -1539,6 +1539,30 @@ def gpt4o_s_request(text, system_prompt, model=None, temp=None, max_tokens=None,
                     top_p=None, frequency_penalty=None, presence_penalty=None):
     response = client.chat.completions.create(
         model=model or "gpt-5",
+        messages=[
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": text
+            },
+        ],
+        temperature=temp or 0.8,
+        max_tokens=max_tokens or 2048,
+        top_p=top_p or 1,
+        frequency_penalty=frequency_penalty or 0,
+        presence_penalty=presence_penalty or 0
+    )
+    reply_text = response.choices[0].message.content
+    return reply_text
+
+
+def gpt5mini_off_request(text, system_prompt, model=None, temp=None, max_tokens=None,
+                    top_p=None, frequency_penalty=None, presence_penalty=None):
+    response = client_official.chat.completions.create(
+        model=model or "gpt-5-mini",
         messages=[
             {
                 "role": "system",

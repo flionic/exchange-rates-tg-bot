@@ -1562,7 +1562,7 @@ def gpt4o_s_request(text, system_prompt, model=None, temp=None, max_tokens=None,
 def gpt5mini_off_request(text, system_prompt, model=None, temp=None, max_tokens=None,
                     top_p=None, frequency_penalty=None, presence_penalty=None):
     response = client_official.chat.completions.create(
-        model=model or "gpt-5-nano",
+        model=model or "gpt-4o-mini",
         messages=[
             {
                 "role": "system",

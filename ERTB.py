@@ -1573,11 +1573,11 @@ def gpt5mini_off_request(text, system_prompt, model=None, temp=None, max_tokens=
                 "content": text
             },
         ],
-        temperature=temp or 0.8,
+        # temperature=temp or 0.8,
         max_completion_tokens=max_tokens or 2048,
-        top_p=top_p or 1,
-        frequency_penalty=frequency_penalty or 0,
-        presence_penalty=presence_penalty or 0
+        # top_p=top_p or 1,
+        # frequency_penalty=frequency_penalty or 0,
+        # presence_penalty=presence_penalty or 0
     )
     reply_text = response.choices[0].message.content
     return reply_text

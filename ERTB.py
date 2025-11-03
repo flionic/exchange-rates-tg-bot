@@ -954,11 +954,12 @@ async def MainVoid(message: types.Message):
     # if with_probability(0.7) and (current_date < offset_date):
     #     await short_reply("Ну вот, о чём я и говорил", message)
 
-    if with_probability(0.008):
-        if messageData["fromUserId"] in blocked_users:
-            return
-        system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
-        await short_reply(gpt4o_s_request(MessageText, system_prompt, model="gpt-4o-mini-2024-07-18"), message)
+    # if with_probability(0.008):
+    #     if messageData["fromUserId"] in blocked_users:
+    #         return
+    #     system_prompt = DBH.GetSetting(messageData["chatID"], "gpt_system_prompt", message.chat.type)
+    #     await short_reply(gpt4o_s_request(MessageText, system_prompt, model="gpt-4o-mini-2024-07-18"), message)
+
         # reply_text = gpt_meme(MessageText)
         # await short_reply(reply_text, message)
 
